@@ -1,4 +1,4 @@
-import heroCarpet from "@/assets/hero-carpet.jpg";
+import heroImage from "@/assets/hero-original.png";
 
 const HeroSection = () => {
   return (
@@ -15,7 +15,7 @@ const HeroSection = () => {
         </p>
         <div className="max-w-3xl mx-auto mb-8 rounded-2xl overflow-hidden shadow-blue">
           <img
-            src={heroCarpet}
+            src={heroImage}
             alt="Tapete automotivo premium aplicado no carro"
             className="w-full h-auto object-cover"
             loading="eager"

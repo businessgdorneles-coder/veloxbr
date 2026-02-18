@@ -6,6 +6,7 @@ import TrustBar from "@/components/TrustBar";
 import SpecsSection from "@/components/SpecsSection";
 import ProductSection from "@/components/ProductSection";
 import ReviewsSection from "@/components/ReviewsSection";
+import SatisfactionGallery from "@/components/SatisfactionGallery";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 
@@ -21,6 +22,7 @@ const Index = () => {
         <SpecsSection />
         <ProductSection />
         <ReviewsSection />
+        <SatisfactionGallery />
         <FAQSection />
       </main>
       <Footer />
