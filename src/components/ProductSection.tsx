@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Check, Truck } from "lucide-react";
+import { vehicleData, VehicleType } from "@/data/vehicleData";
 
 import prod1 from "@/assets/prod1.webp";
 import foto1 from "@/assets/foto1.png";
@@ -18,6 +19,52 @@ const productImages = [prod1, foto1, prod2, prod3, prod4, prod5, prod6, prod7];
 const ProductSection = () => {
   const [selectedKit, setSelectedKit] = useState<"interno" | "completo">("completo");
   const [mainImage, setMainImage] = useState(prod1);
+  const [selectedColor, setSelectedColor] = useState("Preto");
+
+  // Vehicle selectors
+  const [vehicleType, setVehicleType] = useState<string>("");
+  const [brand, setBrand] = useState<string>("");
+  const [model, setModel] = useState<string>("");
+  const [year, setYear] = useState<string>("");
+
+  const brands = useMemo(() => {
+    if (!vehicleType) return [];
+    return Object.keys(vehicleData[vehicleType] || {}).sort();
+  }, [vehicleType]);
+
+  const models = useMemo(() => {
+    if (!vehicleType || !brand) return [];
+    return Object.keys(vehicleData[vehicleType]?.[brand] || {}).sort();
+  }, [vehicleType, brand]);
+
+  const years = useMemo(() => {
+    if (!vehicleType || !brand || !model) return [];
+    return vehicleData[vehicleType]?.[brand]?.[model] || [];
+  }, [vehicleType, brand, model]);
+
+  const handleTypeChange = (value: string) => {
+    setVehicleType(value);
+    setBrand("");
+    setModel("");
+    setYear("");
+  };
+
+  const handleBrandChange = (value: string) => {
+    setBrand(value);
+    setModel("");
+    setYear("");
+  };
+
+  const handleModelChange = (value: string) => {
+    setModel(value);
+    setYear("");
+  };
+
+  const colors = [
+    { name: "Preto", class: "bg-foreground" },
+    { name: "Cinza", class: "bg-muted-foreground" },
+    { name: "Bege", class: "bg-[hsl(40,40%,70%)]" },
+  ];
 
   return (
     <section id="produto" className="py-16 md:py-24">
@@ -121,22 +168,94 @@ const ProductSection = () => {
           <h3 className="font-display font-bold text-lg mb-4">Monte seu tapete sob medida</h3>
           <p className="text-muted-foreground text-sm mb-4">Selecione as opções abaixo:</p>
 
-          <div className="grid sm:grid-cols-2 gap-3 max-w-lg mx-auto mb-6 text-left">
-            <select className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
-              <option>Selecione o tipo</option>
-              <option>Carro</option>
-              <option>Caminhão</option>
-            </select>
-            <select className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
-              <option>Aguardando tipo...</option>
-            </select>
-            <select className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
-              <option>Aguardando marca...</option>
-            </select>
-            <select className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
-              <option>Aguardando modelo...</option>
-            </select>
+          <div className="grid sm:grid-cols-2 gap-3 max-w-lg mx-auto mb-4 text-left">
+            {/* Tipo */}
+            <div>
+              <label className="text-xs font-semibold mb-1 block">Tipo de veículo</label>
+              <select
+                value={vehicleType}
+                onChange={(e) => handleTypeChange(e.target.value)}
+                className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background"
+              >
+                <option value="">Selecione o tipo</option>
+                <option value="carro">Carro</option>
+                <option value="caminhao">Caminhão</option>
+              </select>
+            </div>
+
+            {/* Marca */}
+            <div>
+              <label className="text-xs font-semibold mb-1 block">Marca</label>
+              <select
+                value={brand}
+                onChange={(e) => handleBrandChange(e.target.value)}
+                disabled={!vehicleType}
+                className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background disabled:opacity-50"
+              >
+                <option value="">{vehicleType ? "Selecione a marca" : "Aguardando tipo..."}</option>
+                {brands.map((b) => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Modelo */}
+            <div>
+              <label className="text-xs font-semibold mb-1 block">Modelo</label>
+              <select
+                value={model}
+                onChange={(e) => handleModelChange(e.target.value)}
+                disabled={!brand}
+                className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background disabled:opacity-50"
+              >
+                <option value="">{brand ? "Selecione o modelo" : "Aguardando marca..."}</option>
+                {models.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Ano */}
+            <div>
+              <label className="text-xs font-semibold mb-1 block">Ano</label>
+              <select
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                disabled={!model}
+                className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background disabled:opacity-50"
+              >
+                <option value="">{model ? "Selecione o ano" : "Aguardando modelo..."}</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          {/* Color selector */}
+          <div className="max-w-lg mx-auto mb-6">
+            <label className="text-xs font-semibold mb-2 block text-left">Escolha a cor</label>
+            <div className="flex gap-3 items-center">
+              {colors.map((c) => (
+                <button
+                  key={c.name}
+                  onClick={() => setSelectedColor(c.name)}
+                  className={`w-10 h-10 rounded-full ${c.class} border-2 transition-all ${
+                    selectedColor === c.name ? "border-primary ring-2 ring-primary/30 scale-110" : "border-border"
+                  }`}
+                  aria-label={c.name}
+                />
+              ))}
+              <span className="text-sm text-muted-foreground ml-2">{selectedColor}</span>
+            </div>
+          </div>
+
+          {/* Summary */}
+          {year && (
+            <div className="max-w-lg mx-auto mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm text-left">
+              <strong>Resumo:</strong> {brand} {model} ({year}) • Cor {selectedColor} • Kit {selectedKit === "interno" ? "sem" : "com"} porta-malas
+            </div>
+          )}
 
           <button className="w-full max-w-lg bg-primary text-primary-foreground font-bold py-4 rounded-lg text-base md:text-lg shadow-blue hover:brightness-110 transition-all">
             CONFIRMAR MINHA ENCOMENDA
