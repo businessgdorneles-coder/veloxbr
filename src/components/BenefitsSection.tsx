@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { proxyUrl } from "@/lib/mediaProxy";
 
 const benefits = [
@@ -18,6 +19,40 @@ const benefits = [
   },
 ];
 
+const LazyGif = ({ src, alt }: { src: string; alt: string }) => {
+  const ref = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLoaded(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <img
+      ref={ref}
+      src={loaded ? src : undefined}
+      alt={alt}
+      className="w-full h-full object-cover"
+      loading="lazy"
+      decoding="async"
+      width={400}
+      height={400}
+    />
+  );
+};
+
 const BenefitsSection = () => {
   return (
     <section id="beneficios" className="py-16 md:py-24 bg-section-alt">
@@ -35,15 +70,7 @@ const BenefitsSection = () => {
               className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
             >
               <div className="aspect-square overflow-hidden bg-muted">
-              <img
-                  src={b.gif}
-                  alt={b.title}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                  width={400}
-                  height={400}
-                />
+                <LazyGif src={b.gif} alt={b.title} />
               </div>
               <div className="p-6 text-center">
                 <h3 className="font-display text-lg font-bold mb-2">{b.title}</h3>
