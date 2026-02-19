@@ -60,6 +60,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   // Pause video when scrolled out of view
   useEffect(() => {
@@ -104,7 +105,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
       {/* Video */}
       <div className="relative aspect-[9/14] bg-muted">
         {/* Show reviewer photo as poster until video loads */}
-        {!playing && (
+        {!videoReady && (
           <img
             src={r.photo}
             alt=""
@@ -112,14 +113,20 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
             loading="lazy"
           />
         )}
+        {videoLoaded && !videoReady && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+          </div>
+        )}
         {videoLoaded && (
           <video
             ref={videoRef}
             className="w-full h-full object-cover"
             playsInline
-            preload="auto"
+            preload="none"
             muted={muted}
             loop
+            onCanPlay={() => setVideoReady(true)}
           >
             <source src={r.video} type="video/mp4" />
           </video>
