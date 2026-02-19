@@ -160,9 +160,6 @@ const ProductSection = () => {
           <p className="font-display text-4xl md:text-5xl font-bold text-primary mb-1">
             R$ {selectedKit === "interno" ? "173,93" : "263,53"}
           </p>
-          <p className="text-muted-foreground text-sm mb-4">
-            ou 12x de R$ {selectedKit === "interno" ? "14,49" : "21,96"}
-          </p>
           <p className="text-xs text-muted-foreground mb-6">
             💡 Apenas R$ {selectedKit === "interno" ? "0,51" : "0,73"} por dia — Proteção premium pelo preço de um café ☕
           </p>
