@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import {
   Dialog,
@@ -38,6 +39,7 @@ const OrderReviewPopup = ({
   selectedColor,
   selectedKit,
 }: OrderReviewPopupProps) => {
+  const navigate = useNavigate();
   const [selectedTexture, setSelectedTexture] = useState("");
 
   const summaryRows = [
@@ -123,7 +125,23 @@ const OrderReviewPopup = ({
           >
             Voltar e ajustar
           </button>
-          <button className="w-full bg-success text-primary-foreground font-bold py-4 rounded-xl text-base shadow-lg hover:brightness-110 transition-all">
+          <button
+            onClick={() => {
+              onOpenChange(false);
+              navigate("/checkout", {
+                state: {
+                  brand,
+                  model,
+                  year,
+                  vehicleType,
+                  selectedColor,
+                  selectedKit,
+                  selectedTexture,
+                },
+              });
+            }}
+            className="w-full bg-success text-primary-foreground font-bold py-4 rounded-xl text-base shadow-lg hover:brightness-110 transition-all"
+          >
             Ir para pagamento
           </button>
           <p className="text-xs text-muted-foreground text-center">
