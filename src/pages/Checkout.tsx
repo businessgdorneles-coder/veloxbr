@@ -540,10 +540,19 @@ const Checkout = () => {
                             <select value={installments} onChange={(e) => setInstallments(Number(e.target.value))} className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
                               {[...Array(3)].map((_, i) => {
                                 const n = i + 1;
-                                const parcela = (priceInCents / 100 / n).toFixed(2).replace(".", ",");
+                                const taxaMensal = 0.0299; // ~2.99% a.m. estimativa padrão
+                                let totalComJuros = priceInCents / 100;
+                                if (n > 1) {
+                                  // Juros compostos: PMT = PV * [i(1+i)^n] / [(1+i)^n - 1]
+                                  const fator = Math.pow(1 + taxaMensal, n);
+                                  const pmt = (priceInCents / 100) * (taxaMensal * fator) / (fator - 1);
+                                  totalComJuros = pmt * n;
+                                }
+                                const parcela = (totalComJuros / n).toFixed(2).replace(".", ",");
+                                const totalFormatado = totalComJuros.toFixed(2).replace(".", ",");
                                 return (
                                   <option key={n} value={n}>
-                                    {n}x de R$ {parcela}{n === 1 ? " sem juros" : " com juros"}
+                                    {n}x de R$ {parcela}{n === 1 ? " sem juros" : ` com juros (total R$ ${totalFormatado})`}
                                   </option>
                                 );
                               })}
