@@ -37,7 +37,7 @@ const BenefitsSection = () => {
                   src={b.gif}
                   alt={b.title}
                   className="w-full h-full object-cover"
-                  loading="lazy"
+                  loading="eager"
                 />
               </div>
               <div className="p-6 text-center">
