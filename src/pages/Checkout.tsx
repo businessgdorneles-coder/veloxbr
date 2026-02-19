@@ -538,12 +538,12 @@ const Checkout = () => {
                           <div>
                             <label className="text-sm font-semibold block mb-1">Parcelas</label>
                             <select value={installments} onChange={(e) => setInstallments(Number(e.target.value))} className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
-                              {[...Array(12)].map((_, i) => {
+                              {[...Array(3)].map((_, i) => {
                                 const n = i + 1;
                                 const parcela = (priceInCents / 100 / n).toFixed(2).replace(".", ",");
                                 return (
                                   <option key={n} value={n}>
-                                    {n}x de R$ {parcela} {n === 1 ? " sem juros" : " com juros"}
+                                    {n}x de R$ {parcela}{n === 1 ? " sem juros" : " com juros"}
                                   </option>
                                 );
                               })}
