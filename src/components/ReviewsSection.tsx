@@ -59,8 +59,6 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
 
   // Pause video when scrolled out of view
   useEffect(() => {
@@ -86,9 +84,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
     if (playing) {
       v.pause();
     } else {
-      if (!videoLoaded) setVideoLoaded(true);
-      // Small delay to let video element mount before playing
-      setTimeout(() => videoRef.current?.play(), 50);
+      v.play();
     }
     setPlaying(!playing);
   };
@@ -104,33 +100,16 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
     <div ref={cardRef} className="bg-card rounded-xl border border-border/50 overflow-hidden">
       {/* Video */}
       <div className="relative aspect-[9/14] bg-muted">
-        {/* Show reviewer photo as poster until video loads */}
-        {!videoReady && (
-          <img
-            src={r.photo}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
-        )}
-        {videoLoaded && !videoReady && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
-          </div>
-        )}
-        {videoLoaded && (
-          <video
-            ref={videoRef}
-            className="w-full h-full object-cover"
-            playsInline
-            preload="none"
-            muted={muted}
-            loop
-            onCanPlay={() => setVideoReady(true)}
-          >
-            <source src={r.video} type="video/mp4" />
-          </video>
-        )}
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover"
+          playsInline
+          preload="metadata"
+          muted={muted}
+          loop
+        >
+          <source src={r.video} type="video/mp4" />
+        </video>
 
         {/* Play overlay */}
         <button

@@ -543,7 +543,7 @@ const Checkout = () => {
                                 const parcela = (priceInCents / 100 / n).toFixed(2).replace(".", ",");
                                 return (
                                   <option key={n} value={n}>
-                                    {n}x de R$ {parcela} {n === 1 ? "à vista" : ""}
+                                    {n}x de R$ {parcela} {n === 1 ? " sem juros" : " com juros"}
                                   </option>
                                 );
                               })}
