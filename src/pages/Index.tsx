@@ -9,6 +9,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import SatisfactionGallery from "@/components/SatisfactionGallery";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import SocialProofPopup from "@/components/SocialProofPopup";
 
 const Index = () => {
   return (
@@ -26,6 +27,7 @@ const Index = () => {
         <FAQSection />
       </main>
       <Footer />
+      <SocialProofPopup />
     </div>
   );
 };

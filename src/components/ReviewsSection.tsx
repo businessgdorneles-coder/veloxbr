@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, BadgeCheck } from "lucide-react";
 
 import homem1 from "@/assets/homem1.jpg";
 import mulher1 from "@/assets/mulher1.jpg";
@@ -48,7 +48,9 @@ const ReviewsSection = () => {
                 <img src={r.photo} alt={r.name} className="w-10 h-10 rounded-full object-cover" />
                 <div>
                   <p className="text-sm font-semibold">{r.name}</p>
-                  <p className="text-xs text-muted-foreground">Cliente verificado</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    Cliente verificado <BadgeCheck className="w-3.5 h-3.5 text-primary fill-primary/20" />
+                  </p>
                 </div>
               </div>
             </div>
