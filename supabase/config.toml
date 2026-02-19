@@ -1,1 +1,4 @@
 project_id = "naxmfobsqsnwmfaaldho"
+
+[functions.media-proxy]
+verify_jwt = false
