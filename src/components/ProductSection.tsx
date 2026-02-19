@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Check, Truck } from "lucide-react";
 import { vehicleData, VehicleType } from "@/data/vehicleData";
+import OrderReviewPopup from "@/components/OrderReviewPopup";
 
 import prod1 from "@/assets/prod1.webp";
 import foto1 from "@/assets/foto1.png";
@@ -20,6 +21,7 @@ const ProductSection = () => {
   const [selectedKit, setSelectedKit] = useState<"interno" | "completo">("completo");
   const [mainImage, setMainImage] = useState(prod1);
   const [selectedColor, setSelectedColor] = useState("Preto");
+  const [showReview, setShowReview] = useState(false);
 
   // Vehicle selectors
   const [vehicleType, setVehicleType] = useState<string>("");
@@ -257,7 +259,10 @@ const ProductSection = () => {
             </div>
           )}
 
-          <button className="w-full max-w-lg bg-primary text-primary-foreground font-bold py-4 rounded-lg text-base md:text-lg shadow-blue hover:brightness-110 transition-all">
+          <button
+            onClick={() => setShowReview(true)}
+            className="w-full max-w-lg bg-primary text-primary-foreground font-bold py-4 rounded-lg text-base md:text-lg shadow-blue hover:brightness-110 transition-all"
+          >
             CONFIRMAR MINHA ENCOMENDA
           </button>
           <p className="text-xs text-muted-foreground mt-2">leva menos de 60 segundos</p>
@@ -272,6 +277,17 @@ const ProductSection = () => {
           <p className="text-sm font-semibold">1638+ <span className="text-muted-foreground font-normal">Clientes satisfeitos em todo o Brasil</span></p>
         </div>
       </div>
+
+      <OrderReviewPopup
+        open={showReview}
+        onOpenChange={setShowReview}
+        vehicleType={vehicleType}
+        brand={brand}
+        model={model}
+        year={year}
+        selectedColor={selectedColor}
+        selectedKit={selectedKit}
+      />
     </section>
   );
 };
