@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createHash } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +8,7 @@ const corsHeaders = {
 
 const PIXEL_ID = "D6BLOCJC77U2V3Q5KFF0";
 const API_URL = `https://business-api.tiktok.com/open_api/v1.3/event/track/`;
+
 
 async function sha256(value: string): Promise<string> {
   const data = new TextEncoder().encode(value.trim().toLowerCase());
@@ -70,9 +70,9 @@ serve(async (req) => {
     }
 
     const payload = {
-      pixel_code: PIXEL_ID,
-      test_event_code: undefined, // remove for production
-      events: [eventData],
+      event_source: "web",
+      event_source_id: PIXEL_ID,
+      data: [eventData],
     };
 
     const response = await fetch(API_URL, {
