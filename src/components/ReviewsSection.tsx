@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, lazy, Suspense } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Star, BadgeCheck, Play, Volume2, VolumeX } from "lucide-react";
 import { proxyUrl } from "@/lib/mediaProxy";
 
@@ -59,24 +59,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [inView, setInView] = useState(false);
-
-  // Lazy load video only when card is near viewport
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   // Pause video when scrolled out of view
   useEffect(() => {
@@ -102,7 +85,9 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
     if (playing) {
       v.pause();
     } else {
-      v.play();
+      if (!videoLoaded) setVideoLoaded(true);
+      // Small delay to let video element mount before playing
+      setTimeout(() => videoRef.current?.play(), 50);
     }
     setPlaying(!playing);
   };
@@ -118,12 +103,21 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
     <div ref={cardRef} className="bg-card rounded-xl border border-border/50 overflow-hidden">
       {/* Video */}
       <div className="relative aspect-[9/14] bg-muted">
-        {inView && (
+        {/* Show reviewer photo as poster until video loads */}
+        {!playing && (
+          <img
+            src={r.photo}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+        )}
+        {videoLoaded && (
           <video
             ref={videoRef}
             className="w-full h-full object-cover"
             playsInline
-            preload="metadata"
+            preload="auto"
             muted={muted}
             loop
           >
