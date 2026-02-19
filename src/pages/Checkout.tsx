@@ -282,7 +282,7 @@ const Checkout = () => {
         setTransactionStatus("paid");
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
       } else if (data?.status === "refused") {
-        toast({ title: "Pagamento recusado", description: data?.refusedReason?.message || "Tente outro cartão.", variant: "destructive" });
+        toast({ title: "Pagamento recusado", description: data?.refusedReason?.description || "Tente outro cartão.", variant: "destructive" });
       } else {
         setTransactionStatus(data?.status || "processing");
         toast({ title: "Pagamento em processamento", description: "Aguarde a confirmação." });
