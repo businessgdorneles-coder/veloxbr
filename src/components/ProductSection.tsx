@@ -161,7 +161,7 @@ const ProductSection = () => {
             R$ {selectedKit === "interno" ? "173,93" : "263,53"}
           </p>
           <p className="text-muted-foreground text-sm mb-1">
-            ou 3x de R$ {selectedKit === "interno" ? "57,98" : "87,84"} sem juros
+            ou 3x de R$ {selectedKit === "interno" ? "57,98" : "87,84"} com juros
           </p>
           <p className="text-xs text-muted-foreground mb-6">
             💡 Apenas R$ {selectedKit === "interno" ? "0,51" : "0,73"} por dia — Proteção premium pelo preço de um café ☕
