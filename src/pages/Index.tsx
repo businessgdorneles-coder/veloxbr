@@ -1,14 +1,14 @@
 import { lazy, Suspense, useEffect } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
+import BenefitsSection from "@/components/BenefitsSection";
+import ProductSection from "@/components/ProductSection";
 import { trackViewContent } from "@/lib/tiktokEvents";
 
-// Lazy load below-fold sections
-const BenefitsSection = lazy(() => import("@/components/BenefitsSection"));
+// Lazy load below-fold sections (not immediately visible)
 const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
 const TrustBar = lazy(() => import("@/components/TrustBar"));
 const SpecsSection = lazy(() => import("@/components/SpecsSection"));
-const ProductSection = lazy(() => import("@/components/ProductSection"));
 const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
 const SatisfactionGallery = lazy(() => import("@/components/SatisfactionGallery"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
@@ -21,7 +21,6 @@ const LazySection = ({ children }: { children: React.ReactNode }) => (
 
 const Index = () => {
   useEffect(() => {
-    // Fire ViewContent when landing page loads
     trackViewContent();
   }, []);
 
@@ -30,11 +29,12 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <LazySection><BenefitsSection /></LazySection>
+        {/* BenefitsSection e ProductSection carregados imediatamente — above-the-fold em mobile */}
+        <BenefitsSection />
         <LazySection><FeaturesSection /></LazySection>
         <LazySection><TrustBar /></LazySection>
         <LazySection><SpecsSection /></LazySection>
-        <LazySection><ProductSection /></LazySection>
+        <ProductSection />
         <LazySection><ReviewsSection /></LazySection>
         <LazySection><SatisfactionGallery /></LazySection>
         <LazySection><FAQSection /></LazySection>
@@ -46,3 +46,4 @@ const Index = () => {
 };
 
 export default Index;
+
