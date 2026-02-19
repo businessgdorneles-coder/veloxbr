@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { Star, BadgeCheck, Play, Volume2, VolumeX } from "lucide-react";
+import { proxyUrl } from "@/lib/mediaProxy";
 
 import homem1 from "@/assets/homem1.jpg";
 import mulher1 from "@/assets/mulher1.jpg";
@@ -13,42 +14,42 @@ const reviews = [
     name: "Lucas Almeida",
     photo: homem1,
     review: "Tapete de excelente qualidade, encaixou perfeitamente no carro.",
-    video: "https://oficialcarpetcar.com/img/vd1.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/vd1.mp4"),
     verified: "Cliente verificado",
   },
   {
     name: "Mariana Costa",
     photo: mulher1,
     review: "Deu outra cara pro interior do carro, material muito bonito.",
-    video: "https://oficialcarpetcar.com/img/SaveSora_video_1767843500520.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/SaveSora_video_1767843500520.mp4"),
     verified: "Cliente verificada",
   },
   {
     name: "Rafael Nogueira",
     photo: homem2,
     review: "Produto muito bem acabado e chegou rápido.",
-    video: "https://oficialcarpetcar.com/img/vd2.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/vd2.mp4"),
     verified: "Cliente verificado",
   },
   {
     name: "Ana Paula Ribeiro",
     photo: mulher1_2,
     review: "Ficou lindo no carro, super recomendo.",
-    video: "https://oficialcarpetcar.com/img/vd3.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/vd3.mp4"),
     verified: "Cliente verificada",
   },
   {
     name: "Bruno Martins",
     photo: homem3,
     review: "Encaixe perfeito e acabamento premium.",
-    video: "https://oficialcarpetcar.com/img/vd4.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/vd4.mp4"),
     verified: "Cliente verificado",
   },
   {
     name: "Camila Ferreira",
     photo: mulher3,
     review: "Material fácil de limpar e muito bonito.",
-    video: "https://oficialcarpetcar.com/img/SaveSora_video_1767842395044.mp4",
+    video: proxyUrl("https://oficialcarpetcar.com/img/SaveSora_video_1767842395044.mp4"),
     verified: "Cliente verificada",
   },
 ];

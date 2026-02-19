@@ -1,16 +1,18 @@
+import { proxyUrl } from "@/lib/mediaProxy";
+
 const benefits = [
   {
-    gif: "https://oficialcarpetcar.com/img/gifcobertuura.gif",
+    gif: proxyUrl("https://oficialcarpetcar.com/img/gifcobertuura.gif"),
     title: "Cobertura total",
     description: "Protege o assoalho inteiro, sem áreas expostas.",
   },
   {
-    gif: "https://oficialcarpetcar.com/img/encaixe%20soobmedida%20gif.gif",
+    gif: proxyUrl("https://oficialcarpetcar.com/img/encaixe%20soobmedida%20gif.gif"),
     title: "Encaixe sob medida",
     description: "Ajuste perfeito para não escorregar e não atrapalhar pedais.",
   },
   {
-    gif: "https://oficialcarpetcar.com/img/giflimpeza.gif",
+    gif: proxyUrl("https://oficialcarpetcar.com/img/giflimpeza.gif"),
     title: "Fácil de limpar",
     description: "Resistente a água e sujeira. Limpeza rápida no dia a dia.",
   },
