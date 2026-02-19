@@ -82,7 +82,7 @@ const ProductSection = () => {
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           <div>
             <div className="rounded-xl overflow-hidden border border-border/50 mb-3 bg-muted aspect-square">
-              <img src={mainImage} alt="Tapete Bandeja 3D Premium" className="w-full h-full object-cover" loading="lazy" decoding="async" width={500} height={500} />
+              <img src={mainImage} alt="Tapete Bandeja 3D Premium" className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" width={500} height={500} />
             </div>
             <div className="grid grid-cols-4 gap-2">
               {productImages.map((img, i) => (
@@ -112,7 +112,7 @@ const ProductSection = () => {
                   : "border-border hover:border-primary/40"
               }`}
             >
-              <img src={kitSem} alt="Kit sem porta malas" className="w-20 h-20 rounded-lg object-cover shrink-0" loading="lazy" decoding="async" width={80} height={80} />
+              <img src={kitSem} alt="Kit sem porta malas" className="w-20 h-20 rounded-lg object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
               <div className="flex-1">
                 <span className="inline-block bg-success text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded mb-1">MELHOR PREÇO</span>
                 <h4 className="font-display font-bold text-sm">KIT TAPETES INTERNO <span className="text-muted-foreground font-normal">SEM PORTA MALAS</span></h4>
@@ -135,7 +135,7 @@ const ProductSection = () => {
                   : "border-border hover:border-primary/40"
               }`}
             >
-              <img src={kitCom} alt="Kit com porta malas" className="w-20 h-20 rounded-lg object-cover shrink-0" loading="lazy" decoding="async" width={80} height={80} />
+              <img src={kitCom} alt="Kit com porta malas" className="w-20 h-20 rounded-lg object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
               <div className="flex-1">
                 <span className="inline-block bg-warning text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded mb-1">MAIS VENDIDO</span>
                 <h4 className="font-display font-bold text-sm">KIT TAPETES INTERNO <span className="text-primary font-bold">+ PORTA MALAS</span></h4>

@@ -28,7 +28,8 @@ const SatisfactionGallery = () => {
                 src={img}
                 alt="Cliente com produto"
                 className="w-full h-full object-cover"
-                loading="lazy"
+                loading={i < 3 ? "eager" : "lazy"}
+                fetchPriority={i === 0 ? "high" : "auto"}
                 decoding="async"
                 width={224}
                 height={224}
