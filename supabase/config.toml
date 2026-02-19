@@ -2,3 +2,9 @@ project_id = "naxmfobsqsnwmfaaldho"
 
 [functions.media-proxy]
 verify_jwt = false
+
+[functions.create-transaction]
+verify_jwt = false
+
+[functions.beehive-public-key]
+verify_jwt = false
