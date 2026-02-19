@@ -20,10 +20,13 @@ const SpecsSection = () => {
 
         <div className="max-w-2xl mx-auto mb-10 rounded-xl overflow-hidden shadow-md">
           <img
-            src="https://oficialcarpetcar.com/img/material.gif"
+            src={`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/media-proxy?url=${encodeURIComponent("https://oficialcarpetcar.com/img/material.gif")}`}
             alt="Material premium do tapete veicular"
             className="w-full h-auto object-cover"
             loading="lazy"
+            decoding="async"
+            width={672}
+            height={378}
           />
         </div>
 
