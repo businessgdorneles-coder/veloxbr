@@ -12,13 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const webhookUrl = Deno.env.get("PUSHCUT_WEBHOOK_URL");
-    if (!webhookUrl) {
-      return new Response(
-        JSON.stringify({ error: "Pushcut webhook not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Venda%20Gerada%20%F0%9F%AB%A1";
 
     const body = await req.json();
     const { customerName, amount, paymentMethod, product, city } = body;
