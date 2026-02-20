@@ -17,7 +17,7 @@ serve(async (req) => {
 
     let webhookUrl: string;
     if (notificationType === "pix_paid") {
-      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/PIX%20Pago%20%E2%9C%85";
+      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/PIX%20PAGO%20%E2%9C%85";
     } else if (notificationType === "card_paid") {
       webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Algu%C3%A9m%20pagou%20no%20cart%C3%A3o%20";
     } else {
