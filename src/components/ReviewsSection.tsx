@@ -60,15 +60,40 @@ const reviews = [
   },
 ];
 
-const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
+const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; priority?: boolean }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [posterUrl, setPosterUrl] = useState<string | null>(null);
+
+  // Extract first frame as poster via canvas
+  const extractPoster = () => {
+    const v = videoRef.current;
+    if (!v || posterUrl) return;
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = v.videoWidth || 360;
+      canvas.height = v.videoHeight || 640;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+        const url = canvas.toDataURL("image/jpeg", 0.8);
+        // Only set if we got real content (not blank)
+        if (url.length > 5000) setPosterUrl(url);
+      }
+    } catch (_) { /* cross-origin canvas may throw */ }
+  };
 
   const handleLoadedMetadata = () => {
     const v = videoRef.current;
-    if (v && !playing) v.currentTime = 0.001;
+    if (v && !playing) {
+      v.currentTime = 0.001;
+    }
+  };
+
+  const handleSeeked = () => {
+    extractPoster();
   };
 
   useEffect(() => {
@@ -104,12 +129,28 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
 
   return (
     <div ref={cardRef} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-card hover-lift">
-      <div className="relative aspect-[9/14] bg-muted">
+      <div className="relative aspect-[9/14] bg-muted/60">
+        {/* Skeleton shimmer while video/poster loads */}
+        {!posterUrl && (
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/80 to-muted animate-pulse z-0" />
+        )}
+        {/* Poster image shown while video is not playing */}
+        {posterUrl && !playing && (
+          <img
+            src={posterUrl}
+            alt="Preview do vídeo"
+            className="absolute inset-0 w-full h-full object-cover z-10"
+          />
+        )}
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
-          playsInline preload="metadata" muted={muted} loop
+          playsInline
+          preload={priority ? "auto" : "metadata"}
+          muted={muted}
+          loop
           onLoadedMetadata={handleLoadedMetadata}
+          onSeeked={handleSeeked}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
         >
@@ -117,7 +158,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
         </video>
         <button
           onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors"
+          className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors z-20"
           aria-label={playing ? "Pausar" : "Reproduzir"}
         >
           {!playing && (
@@ -127,7 +168,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
           )}
         </button>
         {playing && (
-          <button onClick={toggleMute} className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors" aria-label={muted ? "Ativar áudio" : "Desativar áudio"}>
+          <button onClick={toggleMute} className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors z-20" aria-label={muted ? "Ativar áudio" : "Desativar áudio"}>
             {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
         )}
@@ -189,8 +230,8 @@ const ReviewsSection = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
-          {reviews.map((r) => (
-            <ReviewVideoCard key={r.name} r={r} />
+          {reviews.map((r, i) => (
+            <ReviewVideoCard key={r.name} r={r} priority={i < 2} />
           ))}
         </div>
 
