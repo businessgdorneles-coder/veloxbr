@@ -6,19 +6,13 @@ const HeroSection = () => {
   return (
     <section className="bg-hero-dark overflow-hidden">
       {/* Top urgency bar */}
-      <div className="bg-primary/10 border-b border-primary/20 py-2.5 px-4">
-        <div className="container flex items-center justify-center gap-4 sm:gap-6 flex-wrap">
-          <span className="flex items-center gap-1.5 text-xs text-primary font-bold tracking-widest uppercase">
-            🔥 Oferta Limitada
-          </span>
-          <span className="hidden sm:block w-px h-3 bg-primary/30" />
-          <span className="flex items-center gap-1.5 text-xs text-white/70 font-medium">
-            🚚 Frete grátis para todo o Brasil
-          </span>
-          <span className="hidden sm:block w-px h-3 bg-primary/30" />
-          <span className="flex items-center gap-1.5 text-xs text-white/70 font-medium">
-            ⚡ Produção sob medida em até 5 dias
-          </span>
+      <div className="bg-primary/10 border-b border-primary/20 py-1.5 px-4">
+        <div className="container flex items-center justify-center gap-3 sm:gap-6">
+          <span className="text-[10px] text-primary font-bold tracking-widest uppercase">🔥 Oferta Limitada</span>
+          <span className="w-px h-3 bg-primary/30 shrink-0" />
+          <span className="text-[10px] text-white/60 font-medium">🚚 Frete grátis</span>
+          <span className="w-px h-3 bg-primary/30 shrink-0 hidden sm:block" />
+          <span className="text-[10px] text-white/60 font-medium hidden sm:block">⚡ Entrega em até 5 dias</span>
         </div>
       </div>
 
