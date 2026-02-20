@@ -6,6 +6,7 @@ import BenefitsSection from "@/components/BenefitsSection";
 import ProductSection from "@/components/ProductSection";
 import UrgencySection from "@/components/UrgencySection";
 import { trackViewContent } from "@/lib/tiktokEvents";
+import { metaTrackViewContent } from "@/lib/metaEvents";
 
 const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
 const EmotionalSection = lazy(() => import("@/components/EmotionalSection"));
@@ -24,6 +25,7 @@ const LazySection = ({ children }: { children: React.ReactNode }) => (
 const Index = () => {
   useEffect(() => {
     trackViewContent();
+    metaTrackViewContent();
   }, []);
 
   return (
