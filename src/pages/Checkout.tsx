@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
 import checkoutBanner from "@/assets/checkout-banner.png";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/tiktokEvents";
+import { metaTrackInitiateCheckout, metaTrackPurchase } from "@/lib/metaEvents";
 
 
 // Will be fetched from backend
@@ -207,6 +208,11 @@ const Checkout = () => {
         priceInCents / 100,
         kitLabel
       );
+      metaTrackInitiateCheckout(
+        { email: email.trim() || undefined, phone: phone || undefined },
+        priceInCents / 100,
+        kitLabel
+      );
     }
   }, [currentStep]);
 
@@ -334,6 +340,11 @@ const Checkout = () => {
                   priceInCents / 100,
                   kitLabel
                 );
+                metaTrackPurchase(
+                  { email: email.trim() || undefined, phone: phone || undefined },
+                  priceInCents / 100,
+                  kitLabel
+                );
                 // Notify PIX paid via Pushcut
                 supabase.functions.invoke("notify-sale", {
                   body: {
@@ -356,6 +367,11 @@ const Checkout = () => {
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
         // Fire Purchase event (server-side + pixel)
         trackPurchase(
+          { email: email.trim() || undefined, phone: phone || undefined },
+          priceInCents / 100,
+          kitLabel
+        );
+        metaTrackPurchase(
           { email: email.trim() || undefined, phone: phone || undefined },
           priceInCents / 100,
           kitLabel
