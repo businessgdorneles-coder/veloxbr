@@ -62,7 +62,10 @@ const Checkout = () => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      if (pixPollingRef.current) clearInterval(pixPollingRef.current);
+    };
   }, []);
 
   const formatTime = (s: number) => {
@@ -101,8 +104,9 @@ const Checkout = () => {
   const [beehivePublicKey, setBeehivePublicKey] = useState("");
 
   // PIX result
-  const [pixData, setPixData] = useState<{ qrcode: string; url: string } | null>(null);
+  const [pixData, setPixData] = useState<{ qrcode: string; url: string; transactionId?: string } | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
+  const pixPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
@@ -299,9 +303,10 @@ const Checkout = () => {
       }
 
       if (data?.pix) {
-        setPixData({ qrcode: data.pix.qrcode, url: data.pix.url });
+        const transactionId = data?.id || data?.transactionId;
+        setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
-        // Notify sale via Pushcut (PIX pending)
+        // Notify sale via Pushcut (PIX gerado)
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -309,8 +314,43 @@ const Checkout = () => {
             paymentMethod: "pix",
             product: kitLabel,
             city: city.trim(),
+            notificationType: "pix_generated",
           },
         });
+
+        // Start polling for PIX payment confirmation
+        if (transactionId) {
+          pixPollingRef.current = setInterval(async () => {
+            try {
+              const { data: statusData } = await supabase.functions.invoke("create-transaction", {
+                body: { checkStatus: true, transactionId },
+              });
+              if (statusData?.status === "paid" || statusData?.status === "authorized") {
+                if (pixPollingRef.current) clearInterval(pixPollingRef.current);
+                setTransactionStatus("paid");
+                toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
+                trackPurchase(
+                  { email: email.trim() || undefined, phone: phone || undefined },
+                  priceInCents / 100,
+                  kitLabel
+                );
+                // Notify PIX paid via Pushcut
+                supabase.functions.invoke("notify-sale", {
+                  body: {
+                    customerName: name.trim(),
+                    amount: priceInCents,
+                    paymentMethod: "pix",
+                    product: kitLabel,
+                    city: city.trim(),
+                    notificationType: "pix_paid",
+                  },
+                });
+              }
+            } catch {
+              // ignore polling errors
+            }
+          }, 5000);
+        }
       } else if (data?.status === "paid" || data?.status === "authorized") {
         setTransactionStatus("paid");
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
@@ -328,6 +368,7 @@ const Checkout = () => {
             paymentMethod: "card",
             product: kitLabel,
             city: city.trim(),
+            notificationType: "card_paid",
           },
         });
       } else if (data?.status === "refused") {

@@ -13,11 +13,16 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { customerName, amount, paymentMethod, product, city } = body;
+    const { customerName, amount, paymentMethod, product, city, notificationType } = body;
 
-    const webhookUrl = paymentMethod === "card"
-      ? "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Algu%C3%A9m%20pagou%20no%20cart%C3%A3o"
-      : "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Venda%20Gerada%20%F0%9F%AB%A1";
+    let webhookUrl: string;
+    if (notificationType === "pix_paid") {
+      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/PIX%20Pago%20%E2%9C%85";
+    } else if (notificationType === "card_paid") {
+      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Algu%C3%A9m%20pagou%20no%20cart%C3%A3o";
+    } else {
+      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Venda%20Gerada%20%F0%9F%AB%A1";
+    }
 
     const methodLabel = paymentMethod === "pix" ? "PIX" : "Cartão de Crédito";
     const amountFormatted = (amount / 100).toFixed(2).replace(".", ",");
