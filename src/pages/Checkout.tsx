@@ -107,8 +107,15 @@ const Checkout = () => {
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
 
-  const priceInCents = orderData?.selectedKit === "completo" ? 26353 : 17393;
-  const priceFormatted = orderData?.selectedKit === "completo" ? "263,53" : "173,93";
+  const basePriceInCents = orderData?.selectedKit === "completo" ? 26353 : 17393;
+  const PIX_DISCOUNT = 0.05;
+  const priceInCents = paymentMethod === "pix"
+    ? Math.round(basePriceInCents * (1 - PIX_DISCOUNT))
+    : basePriceInCents;
+  const priceFormatted = (priceInCents / 100).toFixed(2).replace(".", ",");
+  const basePriceFormatted = (basePriceInCents / 100).toFixed(2).replace(".", ",");
+  const discountInCents = basePriceInCents - Math.round(basePriceInCents * (1 - PIX_DISCOUNT));
+  const discountFormatted = (discountInCents / 100).toFixed(2).replace(".", ",");
   const kitLabel = orderData?.selectedKit === "completo"
     ? "Kit Tapetes Internos Bandeja + Porta-Malas"
     : "Kit Tapetes Internos Bandeja";
@@ -519,9 +526,10 @@ const Checkout = () => {
                       <div className="flex gap-3">
                         <button
                           onClick={() => setPaymentMethod("pix")}
-                          className={`flex-1 border-2 rounded-lg py-3 text-sm font-bold transition-all ${paymentMethod === "pix" ? "border-primary bg-primary/5" : "border-border"}`}
+                          className={`flex-1 border-2 rounded-lg py-3 text-sm font-bold transition-all relative ${paymentMethod === "pix" ? "border-primary bg-primary/5" : "border-border"}`}
                         >
                           PIX
+                          <span className="block text-[10px] font-semibold text-success leading-tight">5% de desconto</span>
                         </button>
                         <button
                           onClick={() => setPaymentMethod("card")}
@@ -532,8 +540,10 @@ const Checkout = () => {
                       </div>
 
                       {paymentMethod === "pix" ? (
-                        <div className="p-4 bg-muted/50 rounded-lg text-center">
-                          <p className="text-sm text-muted-foreground mb-2">Ao confirmar, um QR Code PIX será gerado para pagamento.</p>
+                        <div className="p-4 bg-success/10 border border-success/30 rounded-lg text-center">
+                          <p className="text-sm font-bold text-success mb-1">🎉 Você economiza R$ {discountFormatted} pagando no PIX!</p>
+                          <p className="text-sm text-muted-foreground mb-1">Total com desconto: <strong>R$ {priceFormatted}</strong></p>
+                          <p className="text-xs text-muted-foreground">Ao confirmar, um QR Code PIX será gerado para pagamento.</p>
                           <p className="text-xs text-muted-foreground">Pagamento instantâneo • Aprovação imediata</p>
                         </div>
                       ) : (
@@ -611,8 +621,14 @@ const Checkout = () => {
               <h3 className="font-display font-bold text-lg mb-4 uppercase">Resumo</h3>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-semibold">Produto</span>
-                <span>R$ {priceFormatted}</span>
+                <span className={paymentMethod === "pix" ? "line-through text-muted-foreground" : ""}>R$ {basePriceFormatted}</span>
               </div>
+              {paymentMethod === "pix" && (
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-semibold text-success">Desconto PIX (5%)</span>
+                  <span className="text-success font-bold">– R$ {discountFormatted}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm mb-4 border-b border-border pb-4">
                 <span className="font-semibold text-success">Total</span>
                 <span className="font-bold text-success text-lg">R$ {priceFormatted}</span>
