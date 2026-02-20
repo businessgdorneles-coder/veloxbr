@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap&text=');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -99,14 +99,34 @@
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(217, 91%, 55%), hsl(200, 90%, 60%));
   }
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(38, 92%, 55%), hsl(45, 100%, 65%));
+  }
   .bg-hero-dark {
-    background: linear-gradient(180deg, hsl(220, 40%, 6%) 0%, hsl(220, 35%, 12%) 100%);
+    background: linear-gradient(160deg, hsl(220, 45%, 5%) 0%, hsl(220, 40%, 10%) 50%, hsl(215, 50%, 8%) 100%);
+  }
+  .bg-hero-split {
+    background: linear-gradient(160deg, hsl(220, 45%, 5%) 0%, hsl(220, 40%, 10%) 100%);
   }
   .bg-section-alt {
     background: linear-gradient(180deg, hsl(220, 20%, 97%) 0%, hsl(220, 25%, 93%) 100%);
   }
+  .bg-dark-section {
+    background: linear-gradient(160deg, hsl(220, 40%, 8%) 0%, hsl(220, 35%, 12%) 100%);
+  }
   .shadow-blue {
     box-shadow: 0 8px 30px -8px hsl(217 91% 50% / 0.35);
+  }
+  .shadow-blue-lg {
+    box-shadow: 0 20px 60px -15px hsl(217 91% 50% / 0.4);
+  }
+  .shadow-card {
+    box-shadow: 0 4px 24px -4px hsl(220 25% 20% / 0.12);
+  }
+  .border-glow {
+    border: 1px solid hsl(217 91% 50% / 0.3);
+    box-shadow: 0 0 20px hsl(217 91% 50% / 0.08);
   }
   .animate-marquee {
     animation: marquee 30s linear infinite;
@@ -121,5 +141,19 @@
   }
   .animate-fade-up {
     animation: fade-up 0.6s ease-out forwards;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(217 91% 50% / 0.3); }
+    50% { box-shadow: 0 0 35px hsl(217 91% 50% / 0.55); }
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2.5s ease-in-out infinite;
+  }
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px -8px hsl(220 25% 20% / 0.2);
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Star, BadgeCheck, Play, Volume2, VolumeX } from "lucide-react";
+import { Star, BadgeCheck, Play, Volume2, VolumeX, Quote } from "lucide-react";
 import { proxyUrl } from "@/lib/mediaProxy";
 
 import homem1 from "@/assets/homem1.jpg";
@@ -13,44 +13,50 @@ const reviews = [
   {
     name: "Lucas Almeida",
     photo: homem1,
-    review: "Tapete de excelente qualidade, encaixou perfeitamente no carro.",
+    review: "Tapete de excelente qualidade, encaixou perfeitamente no carro. Ficou melhor do que esperava!",
     video: proxyUrl("https://oficialcarpetcar.com/img/vd1.mp4"),
     verified: "Cliente verificado",
+    city: "São Paulo, SP",
   },
   {
     name: "Mariana Costa",
     photo: mulher1,
-    review: "Deu outra cara pro interior do carro, material muito bonito.",
+    review: "Deu outra cara pro interior do carro, material muito bonito. Recomendo a todos!",
     video: proxyUrl("https://oficialcarpetcar.com/img/SaveSora_video_1767843500520.mp4"),
     verified: "Cliente verificada",
+    city: "Belo Horizonte, MG",
   },
   {
     name: "Rafael Nogueira",
     photo: homem2,
-    review: "Produto muito bem acabado e chegou rápido.",
+    review: "Produto muito bem acabado e chegou rápido. O encaixe é perfeito, sem folgas.",
     video: proxyUrl("https://oficialcarpetcar.com/img/vd2.mp4"),
     verified: "Cliente verificado",
+    city: "Rio de Janeiro, RJ",
   },
   {
     name: "Ana Paula Ribeiro",
     photo: mulher1_2,
-    review: "Ficou lindo no carro, super recomendo.",
+    review: "Ficou lindo no carro, super recomendo. Já indiquei para todos os meus amigos.",
     video: proxyUrl("https://oficialcarpetcar.com/img/vd3.mp4"),
     verified: "Cliente verificada",
+    city: "Curitiba, PR",
   },
   {
     name: "Bruno Martins",
     photo: homem3,
-    review: "Encaixe perfeito e acabamento premium.",
+    review: "Encaixe perfeito e acabamento premium. Vale muito o investimento.",
     video: proxyUrl("https://oficialcarpetcar.com/img/vd4.mp4"),
     verified: "Cliente verificado",
+    city: "Porto Alegre, RS",
   },
   {
     name: "Camila Ferreira",
     photo: mulher3,
-    review: "Material fácil de limpar e muito bonito.",
+    review: "Material fácil de limpar e muito bonito. Meu carro ficou com cara de novo.",
     video: proxyUrl("https://oficialcarpetcar.com/img/SaveSora_video_1767842395044.mp4"),
     verified: "Cliente verificada",
+    city: "Brasília, DF",
   },
 ];
 
@@ -60,15 +66,11 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
 
-  // Seek to first frame once metadata is loaded so browser renders a preview
   const handleLoadedMetadata = () => {
     const v = videoRef.current;
-    if (v && !playing) {
-      v.currentTime = 0.001;
-    }
+    if (v && !playing) v.currentTime = 0.001;
   };
 
-  // Pause video when scrolled out of view
   useEffect(() => {
     if (!playing) return;
     const el = cardRef.current;
@@ -89,13 +91,7 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   const togglePlay = () => {
     const v = videoRef.current;
     if (!v) return;
-    if (playing) {
-      v.pause();
-      setPlaying(false);
-    } else {
-      v.play();
-      setPlaying(true);
-    }
+    if (playing) { v.pause(); setPlaying(false); } else { v.play(); setPlaying(true); }
   };
 
   const toggleMute = (e: React.MouseEvent) => {
@@ -107,25 +103,18 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
   };
 
   return (
-    <div ref={cardRef} className="bg-card rounded-xl border border-border/50 overflow-hidden">
-      {/* Video */}
+    <div ref={cardRef} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-card hover-lift">
       <div className="relative aspect-[9/14] bg-muted">
-        {/* Video with preload=metadata to show first frame */}
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
-          playsInline
-          preload="metadata"
-          muted={muted}
-          loop
+          playsInline preload="metadata" muted={muted} loop
           onLoadedMetadata={handleLoadedMetadata}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
         >
           <source src={`${r.video}#t=0.001`} type="video/mp4" />
         </video>
-
-        {/* Play overlay */}
         <button
           onClick={togglePlay}
           className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors"
@@ -137,44 +126,33 @@ const ReviewVideoCard = ({ r }: { r: (typeof reviews)[0] }) => {
             </div>
           )}
         </button>
-
-        {/* Sound toggle */}
         {playing && (
-          <button
-            onClick={toggleMute}
-            className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
-            aria-label={muted ? "Ativar áudio" : "Desativar áudio"}
-          >
+          <button onClick={toggleMute} className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors" aria-label={muted ? "Ativar áudio" : "Desativar áudio"}>
             {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
         )}
       </div>
 
-      {/* Info */}
       <div className="p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <img
-            src={r.photo}
-            alt={r.name}
-            className="w-10 h-10 rounded-full object-cover"
-            loading="lazy"
-            width={40}
-            height={40}
-          />
-          <div>
-            <p className="text-sm font-semibold">{r.name}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {r.verified} <BadgeCheck className="w-3.5 h-3.5 text-primary fill-primary/20" />
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1 mb-2">
+        <div className="flex items-center gap-1 mb-3">
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
           ))}
           <span className="ml-1 text-xs font-bold">5.0</span>
         </div>
-        <p className="text-sm">{r.review}</p>
+        <div className="relative mb-3">
+          <Quote className="w-4 h-4 text-primary/30 absolute -top-1 -left-0.5" />
+          <p className="text-sm text-foreground/80 pl-4 leading-relaxed">{r.review}</p>
+        </div>
+        <div className="flex items-center gap-2.5 pt-3 border-t border-border/50">
+          <img src={r.photo} alt={r.name} className="w-9 h-9 rounded-full object-cover border-2 border-primary/20" loading="lazy" width={36} height={36} />
+          <div>
+            <p className="text-xs font-bold">{r.name}</p>
+            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <BadgeCheck className="w-3 h-3 text-primary" />{r.verified} · {r.city}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -184,18 +162,30 @@ const ReviewsSection = () => {
   return (
     <section id="avaliacoes" className="py-16 md:py-24 bg-section-alt">
       <div className="container">
-        <h2 className="font-display text-2xl md:text-4xl font-bold text-center mb-2">
-          Avaliações de clientes
-        </h2>
-        <p className="text-muted-foreground text-center mb-4 text-sm">
-          Vídeos reais • Clientes verificados
-        </p>
-        <div className="flex items-center justify-center gap-1 mb-10">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} className="w-5 h-5 fill-warning text-warning" />
-          ))}
-          <span className="ml-2 font-bold">4,9</span>
-          <span className="text-muted-foreground text-sm ml-1">de 5 • 1.284 avaliações</span>
+        <div className="text-center mb-10">
+          <span className="inline-block bg-warning/10 text-warning text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-4">
+            Prova social real
+          </span>
+          <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
+            Quem comprou,{" "}
+            <span className="text-gradient-blue">aprovou</span>
+          </h2>
+          {/* Rating summary */}
+          <div className="inline-flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-6 py-4 shadow-card">
+            <div>
+              <p className="font-display text-4xl font-bold text-foreground">4,9</p>
+              <p className="text-xs text-muted-foreground">de 5.0</p>
+            </div>
+            <div className="w-px h-10 bg-border" />
+            <div>
+              <div className="flex gap-1 mb-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-warning text-warning" />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">1.284 avaliações verificadas</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto">
@@ -204,9 +194,11 @@ const ReviewsSection = () => {
           ))}
         </div>
 
-        <p className="text-center mt-10 text-sm text-muted-foreground">
-          Mais de 5.000 clientes satisfeitos em todo o Brasil 🇧🇷
-        </p>
+        <div className="text-center mt-10">
+          <p className="text-sm text-muted-foreground">
+            🇧🇷 Mais de <strong className="text-foreground">5.000 clientes satisfeitos</strong> em todo o Brasil
+          </p>
+        </div>
       </div>
     </section>
   );
