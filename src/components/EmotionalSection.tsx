@@ -51,7 +51,20 @@ const EmotionalSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-center">
+        {/* Emotion cards — 2x2 on mobile, 2x2 on desktop side by side with image */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8 lg:hidden">
+          {emotions.map((e) => (
+            <div key={e.title} className="bg-card border border-border/50 rounded-2xl p-4 shadow-card">
+              <div className={`w-9 h-9 rounded-xl ${e.bg} flex items-center justify-center mb-2`}>
+                <e.icon className={`w-4 h-4 ${e.color}`} />
+              </div>
+              <h4 className="font-display font-bold text-xs mb-1">{e.title}</h4>
+              <p className="text-muted-foreground text-[11px] leading-relaxed">{e.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden lg:grid lg:grid-cols-2 gap-10 items-center">
           {/* Image collage */}
           <div className="grid grid-cols-2 gap-3 relative">
             <div className="rounded-2xl overflow-hidden aspect-[4/5] shadow-card border border-border/50">
@@ -65,7 +78,6 @@ const EmotionalSection = () => {
                 <img src={gallery3} alt="Detalhe do encaixe perfeito" className="w-full h-full object-cover" loading="lazy" decoding="async" width={280} height={280} />
               </div>
             </div>
-            {/* Floating badge */}
             <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-blue text-center">
               <p className="text-2xl font-display font-bold">5.000+</p>
               <p className="text-xs font-medium opacity-80">clientes felizes</p>

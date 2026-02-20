@@ -49,10 +49,22 @@ const TrustBar = () => {
   return (
     <section className="py-10 bg-section-alt border-y border-border">
       <div className="container">
-        <p className="text-center text-xs font-bold uppercase tracking-widest text-muted-foreground mb-6">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">
           Por que mais de 5.000 clientes confiam na CarpetCar
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {/* Mobile: horizontal scroll row */}
+        <div className="flex gap-3 overflow-x-auto pb-2 lg:hidden scrollbar-hide">
+          {trustItems.map((item) => (
+            <div key={item.title} className="flex flex-col items-center text-center gap-1.5 p-3 rounded-xl bg-card border border-border/50 shadow-card shrink-0 w-28">
+              <div className={`w-9 h-9 rounded-xl ${item.bg} flex items-center justify-center`}>
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+              </div>
+              <p className="text-[10px] font-bold leading-tight">{item.title}</p>
+            </div>
+          ))}
+        </div>
+        {/* Desktop: grid */}
+        <div className="hidden lg:grid lg:grid-cols-6 gap-3">
           {trustItems.map((item) => (
             <div key={item.title} className="flex flex-col items-center text-center gap-2 p-4 rounded-xl bg-card border border-border/50 hover-lift shadow-card">
               <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center`}>

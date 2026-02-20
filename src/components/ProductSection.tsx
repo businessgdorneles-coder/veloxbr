@@ -76,8 +76,85 @@ const ProductSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* Gallery */}
+        {/* Kit selector — mobile: full width cards first */}
+        <div className="space-y-3 mb-6">
+          <h3 className="font-display font-bold text-lg text-center lg:text-left">Selecione seu kit</h3>
+
+          {/* Kit interno */}
+          <button
+            onClick={() => setSelectedKit("interno")}
+            className={`relative w-full flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${selectedKit === "interno" ? "border-primary bg-primary/5 shadow-blue" : "border-border bg-card hover:border-primary/40"}`}
+          >
+            <img src={kitSem} alt="Kit sem porta malas" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
+            <div className="flex-1 min-w-0">
+              <span className="inline-block bg-success text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">MELHOR PREÇO</span>
+              <h4 className="font-display font-bold text-sm leading-tight">KIT INTERNO <span className="text-muted-foreground font-normal">sem porta-malas</span></h4>
+              <p className="text-xs text-muted-foreground line-through">de R$ 397,93</p>
+              <p className="font-display text-xl font-bold text-primary">R$ 173,93</p>
+              <p className="text-[10px] text-success font-semibold">Economize R$ 224,00</p>
+            </div>
+            {selectedKit === "interno" && (
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                <Check className="w-3.5 h-3.5 text-primary-foreground" />
+              </div>
+            )}
+          </button>
+
+          {/* Kit completo */}
+          <button
+            onClick={() => setSelectedKit("completo")}
+            className={`relative w-full flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${selectedKit === "completo" ? "border-primary bg-primary/5 shadow-blue" : "border-border bg-card hover:border-primary/40"}`}
+          >
+            <img src={kitCom} alt="Kit com porta malas" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
+            <div className="flex-1 min-w-0">
+              <span className="inline-block bg-warning text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">⭐ MAIS VENDIDO</span>
+              <h4 className="font-display font-bold text-sm leading-tight">KIT COMPLETO <span className="text-primary font-bold">+ porta-malas</span></h4>
+              <p className="text-xs text-muted-foreground line-through">de R$ 485,67</p>
+              <p className="font-display text-xl font-bold text-primary">R$ 263,53</p>
+              <p className="text-[10px] text-success font-semibold">Economize R$ 222,14</p>
+            </div>
+            {selectedKit === "completo" && (
+              <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
+                <Check className="w-3.5 h-3.5 text-primary-foreground" />
+              </div>
+            )}
+          </button>
+
+          {/* Micro trust */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { icon: ShieldCheck, label: "Garantia inclusa" },
+              { icon: Truck, label: "Frete grátis" },
+              { icon: Lock, label: "Pagamento seguro" },
+            ].map((t) => (
+              <div key={t.label} className="inline-flex items-center gap-1.5 bg-card border border-border/50 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                <t.icon className="w-3 h-3 text-primary" />
+                {t.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Gallery — horizontal scroll on mobile */}
+        <div className="mb-8 lg:hidden">
+          <div className="rounded-2xl overflow-hidden border border-border/50 mb-3 bg-muted aspect-video shadow-card">
+            <img src={mainImage} alt="Tapete Bandeja 3D Premium" className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" width={500} height={280} />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {productImages.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setMainImage(img)}
+                className={`rounded-xl overflow-hidden border-2 w-16 h-16 shrink-0 transition-all ${mainImage === img ? "border-primary shadow-blue" : "border-border/50"}`}
+              >
+                <img src={img} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" width={64} height={64} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Gallery desktop — side by side */}
+        <div className="hidden lg:grid lg:grid-cols-2 gap-8 mb-8">
           <div>
             <div className="rounded-2xl overflow-hidden border border-border/50 mb-3 bg-muted aspect-square shadow-card">
               <img src={mainImage} alt="Tapete Bandeja 3D Premium" className="w-full h-full object-cover" loading="eager" fetchPriority="high" decoding="async" width={500} height={500} />
@@ -94,65 +171,7 @@ const ProductSection = () => {
               ))}
             </div>
           </div>
-
-          {/* Kit selector */}
-          <div className="space-y-3">
-            <h3 className="font-display font-bold text-lg">Selecione seu kit</h3>
-
-            {/* Kit interno */}
-            <button
-              onClick={() => setSelectedKit("interno")}
-              className={`relative w-full flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all ${selectedKit === "interno" ? "border-primary bg-primary/5 shadow-blue" : "border-border bg-card hover:border-primary/40"}`}
-            >
-              <img src={kitSem} alt="Kit sem porta malas" className="w-20 h-20 rounded-xl object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
-              <div className="flex-1">
-                <span className="inline-block bg-success text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">MELHOR PREÇO</span>
-                <h4 className="font-display font-bold text-sm leading-tight">KIT INTERNO <span className="text-muted-foreground font-normal">sem porta-malas</span></h4>
-                <p className="text-xs text-muted-foreground line-through mt-1">de R$ 397,93</p>
-                <p className="font-display text-2xl font-bold text-primary">R$ 173,93</p>
-                <p className="text-[10px] text-success font-semibold">Você economiza R$ 224,00</p>
-              </div>
-              {selectedKit === "interno" && (
-                <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-              )}
-            </button>
-
-            {/* Kit completo */}
-            <button
-              onClick={() => setSelectedKit("completo")}
-              className={`relative w-full flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all ${selectedKit === "completo" ? "border-primary bg-primary/5 shadow-blue" : "border-border bg-card hover:border-primary/40"}`}
-            >
-              <img src={kitCom} alt="Kit com porta malas" className="w-20 h-20 rounded-xl object-cover shrink-0" loading="eager" decoding="async" width={80} height={80} />
-              <div className="flex-1">
-                <span className="inline-block bg-warning text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full mb-1">⭐ MAIS VENDIDO</span>
-                <h4 className="font-display font-bold text-sm leading-tight">KIT COMPLETO <span className="text-primary font-bold">+ porta-malas</span></h4>
-                <p className="text-xs text-muted-foreground line-through mt-1">de R$ 485,67</p>
-                <p className="font-display text-2xl font-bold text-primary">R$ 263,53</p>
-                <p className="text-[10px] text-success font-semibold">Você economiza R$ 222,14</p>
-              </div>
-              {selectedKit === "completo" && (
-                <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5 text-primary-foreground" />
-                </div>
-              )}
-            </button>
-
-            {/* Micro trust */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              {[
-                { icon: ShieldCheck, label: "Garantia inclusa" },
-                { icon: Truck, label: "Frete grátis" },
-                { icon: Lock, label: "Pagamento seguro" },
-              ].map((t) => (
-                <div key={t.label} className="inline-flex items-center gap-1.5 bg-card border border-border/50 rounded-full px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                  <t.icon className="w-3 h-3 text-primary" />
-                  {t.label}
-                </div>
-              ))}
-            </div>
-          </div>
+          <div className="hidden" />
         </div>
 
         {/* Configurator + CTA */}
