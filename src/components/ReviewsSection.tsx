@@ -65,36 +65,7 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [posterUrl, setPosterUrl] = useState<string | null>(null);
-
-  // Extract first frame as poster via canvas
-  const extractPoster = () => {
-    const v = videoRef.current;
-    if (!v || posterUrl) return;
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = v.videoWidth || 360;
-      canvas.height = v.videoHeight || 640;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
-        const url = canvas.toDataURL("image/jpeg", 0.8);
-        // Only set if we got real content (not blank)
-        if (url.length > 5000) setPosterUrl(url);
-      }
-    } catch (_) { /* cross-origin canvas may throw */ }
-  };
-
-  const handleLoadedMetadata = () => {
-    const v = videoRef.current;
-    if (v && !playing) {
-      v.currentTime = 0.001;
-    }
-  };
-
-  const handleSeeked = () => {
-    extractPoster();
-  };
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     if (!playing) return;
@@ -129,28 +100,43 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
 
   return (
     <div ref={cardRef} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-card hover-lift">
-      <div className="relative aspect-[9/14] bg-muted/60">
-        {/* Skeleton shimmer while video/poster loads */}
-        {!posterUrl && (
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/80 to-muted animate-pulse z-0" />
-        )}
-        {/* Poster image shown while video is not playing */}
-        {posterUrl && !playing && (
-          <img
-            src={posterUrl}
-            alt="Preview do vídeo"
-            className="absolute inset-0 w-full h-full object-cover z-10"
-          />
+      <div className="relative aspect-[9/14] bg-muted/60 overflow-hidden">
+        {/* Reviewer photo as styled placeholder until video plays */}
+        {!playing && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
+            {/* Blurred background from reviewer photo */}
+            <img
+              src={r.photo}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-60"
+              aria-hidden="true"
+            />
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
+            {/* Reviewer photo circle */}
+            <img
+              src={r.photo}
+              alt={r.name}
+              className="relative w-20 h-20 rounded-full object-cover border-3 border-white/80 shadow-xl mb-3 z-10"
+            />
+            <p className="relative text-white font-bold text-sm z-10">{r.name}</p>
+            <p className="relative text-white/70 text-xs z-10">{r.city}</p>
+            {/* Stars */}
+            <div className="relative flex gap-0.5 mt-2 z-10">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+              ))}
+            </div>
+          </div>
         )}
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-300 ${playing ? "opacity-100" : "opacity-0"}`}
           playsInline
           preload={priority ? "auto" : "metadata"}
           muted={muted}
           loop
-          onLoadedMetadata={handleLoadedMetadata}
-          onSeeked={handleSeeked}
+          onCanPlay={() => setVideoReady(true)}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
         >
@@ -158,11 +144,11 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
         </video>
         <button
           onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors z-20"
+          className="absolute inset-0 flex items-center justify-center z-20"
           aria-label={playing ? "Pausar" : "Reproduzir"}
         >
           {!playing && (
-            <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg animate-pulse">
               <Play className="w-6 h-6 text-foreground ml-1" fill="currentColor" />
             </div>
           )}
