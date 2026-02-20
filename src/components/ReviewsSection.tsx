@@ -67,6 +67,18 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
   const [muted, setMuted] = useState(true);
   const [videoReady, setVideoReady] = useState(false);
 
+  // Force first frame to render by seeking on load
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const handleLoaded = () => {
+      if (!playing) v.currentTime = 0.001;
+    };
+    v.addEventListener("loadeddata", handleLoaded);
+    return () => v.removeEventListener("loadeddata", handleLoaded);
+  }, []);
+
+  // Pause when scrolled out of view
   useEffect(() => {
     if (!playing) return;
     const el = cardRef.current;
@@ -100,38 +112,19 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
 
   return (
     <div ref={cardRef} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-card hover-lift">
-      <div className="relative aspect-[9/14] bg-muted/60 overflow-hidden">
-        {/* Reviewer photo as styled placeholder until video plays */}
-        {!playing && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center">
-            {/* Blurred background from reviewer photo */}
-            <img
-              src={r.photo}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover scale-110 blur-xl opacity-60"
-              aria-hidden="true"
-            />
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
-            {/* Reviewer photo circle */}
-            <img
-              src={r.photo}
-              alt={r.name}
-              className="relative w-20 h-20 rounded-full object-cover border-3 border-white/80 shadow-xl mb-3 z-10"
-            />
-            <p className="relative text-white font-bold text-sm z-10">{r.name}</p>
-            <p className="relative text-white/70 text-xs z-10">{r.city}</p>
-            {/* Stars */}
-            <div className="relative flex gap-0.5 mt-2 z-10">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
-              ))}
-            </div>
-          </div>
+      <div className="relative aspect-[9/14] bg-black overflow-hidden">
+        {/* Fallback: reviewer photo shown until video first frame loads */}
+        {!videoReady && !playing && (
+          <img
+            src={r.photo}
+            alt={r.name}
+            className="absolute inset-0 w-full h-full object-cover z-[5]"
+          />
         )}
+        {/* Video — shows first frame via seek on loadeddata */}
         <video
           ref={videoRef}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${playing ? "opacity-100" : "opacity-0"}`}
+          className="w-full h-full object-cover"
           playsInline
           preload={priority ? "auto" : "metadata"}
           muted={muted}
