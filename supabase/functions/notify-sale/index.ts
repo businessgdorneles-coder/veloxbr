@@ -19,7 +19,7 @@ serve(async (req) => {
     if (notificationType === "pix_paid") {
       webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/PIX%20Pago%20%E2%9C%85";
     } else if (notificationType === "card_paid") {
-      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Algu%C3%A9m%20pagou%20no%20cart%C3%A3o";
+      webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Algu%C3%A9m%20pagou%20no%20cart%C3%A3o%20";
     } else {
       webhookUrl = "https://api.pushcut.io/fpGGxdRPpz8LT_ltAUhgw/notifications/Venda%20Gerada%20%F0%9F%AB%A1";
     }
