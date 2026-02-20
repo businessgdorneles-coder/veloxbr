@@ -22,6 +22,22 @@ serve(async (req) => {
 
     const body = await req.json();
 
+    // Handle status check for PIX polling
+    if (body.checkStatus && body.transactionId) {
+      const encoder = new TextEncoder();
+      const encoded = encoder.encode(`${secretKey}:x`);
+      const authToken = btoa(String.fromCharCode(...encoded));
+
+      const statusRes = await fetch(`https://api.conta.paybeehive.com.br/v1/transactions/${body.transactionId}`, {
+        headers: { Authorization: `Basic ${authToken}` },
+      });
+      const statusData = await statusRes.json();
+      return new Response(JSON.stringify(statusData), {
+        status: statusRes.ok ? 200 : statusRes.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Validate required fields
     const { amount, paymentMethod, customer, items, card, shipping, installments, pix } = body;
 

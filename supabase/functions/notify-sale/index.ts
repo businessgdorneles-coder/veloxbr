@@ -27,10 +27,21 @@ serve(async (req) => {
     const methodLabel = paymentMethod === "pix" ? "PIX" : "Cartão de Crédito";
     const amountFormatted = (amount / 100).toFixed(2).replace(".", ",");
 
-    const notificationBody = {
-      title: `💰 Nova venda! R$ ${amountFormatted}`,
-      text: `${customerName} (${city || "Brasil"}) comprou ${product} via ${methodLabel}`,
-    };
+    let title: string;
+    let text: string;
+
+    if (notificationType === "pix_generated") {
+      title = `🔔 PIX Gerado! R$ ${amountFormatted}`;
+      text = `${customerName} (${city || "Brasil"}) gerou um PIX para ${product}. Aguardando pagamento...`;
+    } else if (notificationType === "pix_paid") {
+      title = `PIX PAGO ✅ R$ ${amountFormatted}`;
+      text = `${customerName} (${city || "Brasil"}) confirmou o pagamento via PIX de ${product}!`;
+    } else {
+      title = `💳 Cartão Aprovado! R$ ${amountFormatted}`;
+      text = `${customerName} (${city || "Brasil"}) comprou ${product} via ${methodLabel}!`;
+    }
+
+    const notificationBody = { title, text };
 
     const response = await fetch(webhookUrl, {
       method: "POST",
