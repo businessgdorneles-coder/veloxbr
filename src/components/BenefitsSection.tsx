@@ -42,11 +42,26 @@ const LazyGif = ({ src, alt }: { src: string; alt: string }) => {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { setLoaded(true); observer.disconnect(); } }, { rootMargin: "200px" });
+    // rootMargin 400px = start loading well before entering viewport
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setLoaded(true); observer.disconnect(); } },
+      { rootMargin: "400px" }
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
-  return <img ref={ref} src={loaded ? src : undefined} alt={alt} className="w-full h-full object-cover" loading="lazy" decoding="async" width={400} height={400} />;
+  return (
+    <img
+      ref={ref}
+      src={loaded ? src : undefined}
+      alt={alt}
+      className="w-full h-full object-cover"
+      loading="lazy"
+      decoding="async"
+      width={400}
+      height={400}
+    />
+  );
 };
 
 const BenefitsSection = () => {
