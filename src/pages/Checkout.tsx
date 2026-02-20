@@ -301,6 +301,16 @@ const Checkout = () => {
       if (data?.pix) {
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url });
         setTransactionStatus("waiting_payment");
+        // Notify sale via Pushcut (PIX pending)
+        supabase.functions.invoke("notify-sale", {
+          body: {
+            customerName: name.trim(),
+            amount: priceInCents,
+            paymentMethod: "pix",
+            product: kitLabel,
+            city: city.trim(),
+          },
+        });
       } else if (data?.status === "paid" || data?.status === "authorized") {
         setTransactionStatus("paid");
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
@@ -310,6 +320,16 @@ const Checkout = () => {
           priceInCents / 100,
           kitLabel
         );
+        // Notify sale via Pushcut
+        supabase.functions.invoke("notify-sale", {
+          body: {
+            customerName: name.trim(),
+            amount: priceInCents,
+            paymentMethod: "card",
+            product: kitLabel,
+            city: city.trim(),
+          },
+        });
       } else if (data?.status === "refused") {
         toast({ title: "Pagamento recusado", description: data?.refusedReason?.description || "Tente outro cartão.", variant: "destructive" });
       } else {
