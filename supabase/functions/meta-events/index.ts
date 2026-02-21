@@ -40,13 +40,19 @@ serve(async (req) => {
       );
     }
 
+    // Extract client IP from request headers
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("cf-connecting-ip")
+      || req.headers.get("x-real-ip")
+      || userData?.ip;
+
     // Build user_data with hashed PII
-    const user_data: Record<string, string> = {};
+    const user_data: Record<string, unknown> = {};
     if (userData?.email) user_data.em = [await sha256(userData.email)];
     if (userData?.phone) user_data.ph = [await sha256(userData.phone.replace(/\D/g, ""))];
     if (userData?.firstName) user_data.fn = [await sha256(userData.firstName)];
     if (userData?.lastName) user_data.ln = [await sha256(userData.lastName)];
-    if (userData?.ip) user_data.client_ip_address = userData.ip;
+    if (clientIp) user_data.client_ip_address = clientIp;
     if (userData?.userAgent) user_data.client_user_agent = userData.userAgent;
     if (userData?.fbc) user_data.fbc = userData.fbc;
     if (userData?.fbp) user_data.fbp = userData.fbp;
@@ -76,10 +82,12 @@ serve(async (req) => {
     const result = await response.json();
 
     if (!response.ok) {
-      console.error("Meta CAPI error:", JSON.stringify(result));
+      console.warn("Meta CAPI warning:", JSON.stringify(result));
+      // Return 200 anyway — pixel event already fired client-side.
+      // CAPI errors for missing PII (e.g. PageView) should not break the app.
       return new Response(
-        JSON.stringify({ error: "Meta CAPI error", details: result }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ success: false, warning: "Meta CAPI rejected event (insufficient PII)", details: result }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
