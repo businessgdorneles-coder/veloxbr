@@ -12,8 +12,6 @@ const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
 const EmotionalSection = lazy(() => import("@/components/EmotionalSection"));
 const SpecsSection = lazy(() => import("@/components/SpecsSection"));
 const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
-const SatisfactionGallery = lazy(() => import("@/components/SatisfactionGallery"));
-const InstagramSection = lazy(() => import("@/components/InstagramSection"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 const SocialProofPopup = lazy(() => import("@/components/SocialProofPopup"));
@@ -58,13 +56,6 @@ const Index = () => {
 
         {/* 8. Prova social — avaliações */}
         <LazySection><ReviewsSection /></LazySection>
-
-        {/* 9. Galeria de clientes satisfeitos */}
-        <LazySection><SatisfactionGallery /></LazySection>
-
-        {/* 10. Instagram */}
-        <LazySection><InstagramSection /></LazySection>
-
         {/* 11. FAQ */}
         <LazySection><FAQSection /></LazySection>
       </main>

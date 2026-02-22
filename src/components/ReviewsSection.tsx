@@ -65,18 +65,6 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  const [videoReady, setVideoReady] = useState(false);
-
-  // Force first frame to render by seeking on load
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    const handleLoaded = () => {
-      if (!playing) v.currentTime = 0.001;
-    };
-    v.addEventListener("loadeddata", handleLoaded);
-    return () => v.removeEventListener("loadeddata", handleLoaded);
-  }, []);
 
   // Pause when scrolled out of view
   useEffect(() => {
@@ -113,15 +101,7 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
   return (
     <div ref={cardRef} className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-card hover-lift">
       <div className="relative aspect-[9/14] bg-black overflow-hidden">
-        {/* Fallback: reviewer photo shown until video first frame loads */}
-        {!videoReady && !playing && (
-          <img
-            src={r.photo}
-            alt={r.name}
-            className="absolute inset-0 w-full h-full object-cover z-[5]"
-          />
-        )}
-        {/* Video — shows first frame via seek on loadeddata */}
+        {/* Video — first frame rendered via #t=0.001 */}
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
@@ -129,12 +109,10 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
           preload={priority ? "auto" : "metadata"}
           muted={muted}
           loop
-          onCanPlay={() => setVideoReady(true)}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-        >
-          <source src={`${r.video}#t=0.001`} type="video/mp4" />
-        </video>
+          src={`${r.video}#t=0.001`}
+        />
         <button
           onClick={togglePlay}
           className="absolute inset-0 flex items-center justify-center z-20"
