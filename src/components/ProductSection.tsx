@@ -76,6 +76,22 @@ const ProductSection = () => {
           </p>
         </div>
 
+        {/* Selo Reclame Aqui */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-5 py-3 shadow-card">
+            <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-success" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                Reclame Aqui
+                <span className="inline-block bg-success/15 text-success text-[10px] font-bold px-2 py-0.5 rounded-full">ÓTIMO</span>
+              </p>
+              <p className="text-[11px] text-muted-foreground">Nota <strong className="text-success">8.7/10</strong> · 98% dos problemas resolvidos</p>
+            </div>
+          </div>
+        </div>
+
         {/* Kit selector — mobile: full width cards first */}
         <div className="space-y-3 mb-6">
           <h3 className="font-display font-bold text-lg text-center lg:text-left">Selecione seu kit</h3>
