@@ -64,6 +64,21 @@ const ProductSection = () => {
       <div className="container max-w-5xl">
         {/* Section header */}
         <div className="text-center mb-10">
+          {/* Selo Reclame Aqui */}
+          <div className="flex justify-center mb-5">
+            <div className="inline-flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-5 py-3 shadow-card">
+              <img src="https://s3.amazonaws.com/rfrqimg/logo_RA_2.png" alt="Reclame Aqui" className="h-7 object-contain" loading="lazy" />
+              <div className="w-px h-8 bg-border" />
+              <div>
+                <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  Reputação
+                  <span className="inline-block bg-success/15 text-success text-[10px] font-bold px-2 py-0.5 rounded-full">ÓTIMO</span>
+                </p>
+                <p className="text-[11px] text-muted-foreground">Nota <strong className="text-success">8.7/10</strong> · 98% resolvidos</p>
+              </div>
+            </div>
+          </div>
+
           <span className="inline-block bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-4">
             Monte seu kit
           </span>
@@ -74,22 +89,6 @@ const ProductSection = () => {
           <p className="text-muted-foreground text-sm">
             Produzido sob medida para o seu veículo · Frete grátis · Entrega de 5 a 10 dias úteis
           </p>
-        </div>
-
-        {/* Selo Reclame Aqui */}
-        <div className="flex justify-center mb-8">
-          <div className="inline-flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-5 py-3 shadow-card">
-            <div className="w-10 h-10 rounded-full bg-success/15 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5 text-success" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                Reclame Aqui
-                <span className="inline-block bg-success/15 text-success text-[10px] font-bold px-2 py-0.5 rounded-full">ÓTIMO</span>
-              </p>
-              <p className="text-[11px] text-muted-foreground">Nota <strong className="text-success">8.7/10</strong> · 98% dos problemas resolvidos</p>
-            </div>
-          </div>
         </div>
 
         {/* Kit selector — mobile: full width cards first */}
