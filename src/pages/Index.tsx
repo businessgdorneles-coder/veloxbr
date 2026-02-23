@@ -5,13 +5,8 @@ import HeroSection from "@/components/HeroSection";
 import { trackViewContent } from "@/lib/tiktokEvents";
 import { metaTrackViewContent } from "@/lib/metaEvents";
 
-const BenefitsSection = lazy(() => import("@/components/BenefitsSection"));
-const EmotionalSection = lazy(() => import("@/components/EmotionalSection"));
-const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
-const StatsSection = lazy(() => import("@/components/StatsSection"));
-const SpecsSection = lazy(() => import("@/components/SpecsSection"));
+const DescriptionSection = lazy(() => import("@/components/DescriptionSection"));
 const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
-const FAQSection = lazy(() => import("@/components/FAQSection"));
 const Footer = lazy(() => import("@/components/Footer"));
 const SocialProofPopup = lazy(() => import("@/components/SocialProofPopup"));
 
@@ -33,26 +28,11 @@ const Index = () => {
         {/* Product hero (galeria + configurador) */}
         <HeroSection />
 
-        {/* Benefícios + Comparativo */}
-        <LazySection><BenefitsSection /></LazySection>
-
-        {/* Apelo emocional */}
-        <LazySection><EmotionalSection /></LazySection>
-
-        {/* Diferenciais técnicos */}
-        <LazySection><FeaturesSection /></LazySection>
-
-        {/* Stats */}
-        <LazySection><StatsSection /></LazySection>
-
-        {/* Especificações */}
-        <LazySection><SpecsSection /></LazySection>
+        {/* Descrição do produto */}
+        <LazySection><DescriptionSection /></LazySection>
 
         {/* Avaliações */}
         <LazySection><ReviewsSection /></LazySection>
-
-        {/* FAQ */}
-        <LazySection><FAQSection /></LazySection>
       </main>
       <LazySection><Footer /></LazySection>
       <LazySection><SocialProofPopup /></LazySection>
