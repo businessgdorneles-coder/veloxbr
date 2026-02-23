@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Clock, Shield, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Shield, BadgeCheck } from "lucide-react";
 import logoVelox from "@/assets/logo-velox.png";
 
 const Footer = () => {
@@ -26,6 +26,10 @@ const Footer = () => {
             <p className="text-white/40 text-xs leading-relaxed">
               Tapetes automotivos 3D premium, produzidos sob medida para o seu veículo.
             </p>
+            <div className="flex items-center gap-1.5 mt-3">
+              <BadgeCheck className="w-4 h-4 text-success" />
+              <span className="text-success text-xs font-bold">Loja Verificada</span>
+            </div>
           </div>
 
           <div>
@@ -46,10 +50,11 @@ const Footer = () => {
           <div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">Empresa</p>
             <div className="space-y-2">
-              <p className="text-white/50 text-xs">CNPJ: 07.418.219/0001-54</p>
+              <p className="text-white/50 text-xs">Velox Centro Automotivo LTDA</p>
+              <p className="text-white/50 text-xs">CNPJ: 64.809.798/0001-08</p>
               <p className="flex items-start gap-2 text-white/50 text-xs justify-center sm:justify-start">
                 <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                Rua Benedito Carvalho, SN, Tremembé-SP
+                Av. Jorge João Saad, SN Vl. Progredior – CEP: 05618-000 – São Paulo/SP
               </p>
             </div>
           </div>
