@@ -21,15 +21,15 @@ const Footer = () => {
 
       <div className="container max-w-4xl py-10">
         <div className="grid sm:grid-cols-3 gap-8 mb-8 text-center sm:text-left">
-          <div>
-            <img src={logoVelox} alt="Velox" className="h-8 object-contain mb-3" />
-            <p className="text-white/40 text-xs leading-relaxed">
-              Tapetes automotivos 3D premium, produzidos sob medida para o seu veículo.
-            </p>
-            <div className="flex items-center gap-1.5 mt-3">
+          <div className="flex flex-col items-center sm:items-start">
+            <div className="flex items-center gap-2 mb-3">
+              <img src={logoVelox} alt="Velox" className="h-8 object-contain" />
               <BadgeCheck className="w-4 h-4 text-success" />
               <span className="text-success text-xs font-bold">Loja Verificada</span>
             </div>
+            <p className="text-white/40 text-xs leading-relaxed">
+              Tapetes automotivos 3D premium, produzidos sob medida para o seu veículo.
+            </p>
           </div>
 
           <div>
