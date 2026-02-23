@@ -158,8 +158,8 @@ const ReviewVideoCard = ({ r, priority = false }: { r: (typeof reviews)[0]; prio
 
 const ReviewsSection = () => {
   return (
-    <section id="avaliacoes" className="py-16 md:py-24 bg-section-alt">
-      <div className="container">
+    <section id="avaliacoes" className="py-16 md:py-24 bg-section-alt overflow-hidden">
+      <div className="container px-4">
         <div className="text-center mb-10">
           <span className="inline-block bg-warning/10 text-warning text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-4">
             Prova social real
