@@ -1,15 +1,15 @@
 import { lazy, Suspense, useEffect } from "react";
+import MarqueeBar from "@/components/MarqueeBar";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import TrustBar from "@/components/TrustBar";
-import BenefitsSection from "@/components/BenefitsSection";
-import ProductSection from "@/components/ProductSection";
-import UrgencySection from "@/components/UrgencySection";
 import { trackViewContent } from "@/lib/tiktokEvents";
 import { metaTrackViewContent } from "@/lib/metaEvents";
 
-const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
+const BenefitsSection = lazy(() => import("@/components/BenefitsSection"));
 const EmotionalSection = lazy(() => import("@/components/EmotionalSection"));
+const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
+const StatsSection = lazy(() => import("@/components/StatsSection"));
 const SpecsSection = lazy(() => import("@/components/SpecsSection"));
 const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
 const FAQSection = lazy(() => import("@/components/FAQSection"));
@@ -28,35 +28,34 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <MarqueeBar />
       <Header />
       <main>
-        {/* 1. Hero — impacto imediato */}
+        {/* 1. Hero = Product page (galeria + configurador) */}
         <HeroSection />
 
-        {/* 2. Confiança imediata */}
+        {/* 2. Trust icons bar */}
         <TrustBar />
 
-        {/* 3. Benefícios + Comparativo (por que comprar) */}
-        <BenefitsSection />
+        {/* 3. Benefícios + Comparativo */}
+        <LazySection><BenefitsSection /></LazySection>
 
-        {/* 4. Apelo emocional (valorização, sensação, proteção) */}
+        {/* 4. Apelo emocional */}
         <LazySection><EmotionalSection /></LazySection>
 
-        {/* 5. Tecnologia e diferenciais técnicos */}
+        {/* 5. Diferenciais técnicos */}
         <LazySection><FeaturesSection /></LazySection>
 
-        {/* 6. Especificações premium */}
+        {/* 6. Stats + Features */}
+        <LazySection><StatsSection /></LazySection>
+
+        {/* 7. Especificações */}
         <LazySection><SpecsSection /></LazySection>
 
-        {/* 7. Urgência — estoque + vendas recentes */}
-        <UrgencySection />
-
-        {/* 8. Produto — configure e compre */}
-        <ProductSection />
-
-        {/* 8. Prova social — avaliações */}
+        {/* 8. Avaliações */}
         <LazySection><ReviewsSection /></LazySection>
-        {/* 11. FAQ */}
+
+        {/* 9. FAQ */}
         <LazySection><FAQSection /></LazySection>
       </main>
       <LazySection><Footer /></LazySection>
