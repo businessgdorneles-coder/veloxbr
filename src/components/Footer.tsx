@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin, Clock, Shield, Instagram } from "lucide-react";
+import logoVelox from "@/assets/logo-velox.png";
 
 const Footer = () => {
   return (
@@ -21,9 +22,7 @@ const Footer = () => {
       <div className="container max-w-4xl py-10">
         <div className="grid sm:grid-cols-3 gap-8 mb-8 text-center sm:text-left">
           <div>
-            <p className="font-display text-xl font-bold text-white mb-3">
-              <span className="text-gradient-blue">CARPET</span>CAR
-            </p>
+            <img src={logoVelox} alt="Velox" className="h-8 object-contain mb-3" />
             <p className="text-white/40 text-xs leading-relaxed">
               Tapetes automotivos 3D premium, produzidos sob medida para o seu veículo.
             </p>
@@ -62,7 +61,7 @@ const Footer = () => {
             <span>Pagamento seguro • Ambiente protegido com SSL</span>
           </div>
           <p className="text-white/20 text-[10px]">
-            &copy; {new Date().getFullYear()} CarpetCar LTDA. Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Velox LTDA. Todos os direitos reservados.
           </p>
         </div>
       </div>
