@@ -24,7 +24,7 @@ const Logo = () => (
 
 const Header = () => {
   return (
-    <header className="sticky top-0 z-50 bg-hero-dark border-b border-white/10">
+    <header className="sticky top-0 z-50 bg-[hsl(220,40%,8%)] border-b border-white/10">
       <div className="container flex items-center justify-between py-3">
         <Logo />
         <div className="flex items-center gap-3">
