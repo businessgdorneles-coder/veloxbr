@@ -68,8 +68,8 @@ const HeroSection = () => {
                 src={productImages[currentImage]}
                 alt="Tapete Bandeja 3D Premium"
                 className="w-full h-full object-cover"
-                loading="eager"
-                fetchPriority="high"
+                loading={currentImage === 0 ? "eager" : "lazy"}
+                fetchPriority={currentImage === 0 ? "high" : "auto"}
                 decoding="async"
                 width={600}
                 height={600}
