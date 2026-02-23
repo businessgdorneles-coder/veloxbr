@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, BadgeCheck, Star } from "lucide-react";
 import { vehicleData } from "@/data/vehicleData";
 import OrderReviewPopup from "@/components/OrderReviewPopup";
 
@@ -101,9 +101,21 @@ const HeroSection = () => {
 
           {/* RIGHT: Product Info */}
           <div className="space-y-5">
-            <h1 className="font-display font-bold text-xl md:text-2xl xl:text-3xl text-foreground leading-tight uppercase">
-              Tapete Bandeja 3D Premium 5 Peças Incluso Porta Malas
-            </h1>
+            <div>
+              <h1 className="font-display font-bold text-xl md:text-2xl xl:text-3xl text-foreground leading-tight uppercase inline">
+                Tapete Bandeja 3D Premium 5 Peças Incluso Porta Malas
+              </h1>
+              <BadgeCheck className="inline-block w-5 h-5 md:w-6 md:h-6 text-success ml-2 align-middle -mt-1" />
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <div className="flex gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-warning text-warning" />
+                  ))}
+                </div>
+                <span className="text-warning text-sm font-bold">(4.8)</span>
+                <span className="text-warning text-sm">647 avaliações</span>
+              </div>
+            </div>
 
             {/* Vehicle Selector - Sequential Steps */}
             <div className="bg-card border border-border rounded-2xl p-5">
