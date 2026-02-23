@@ -6,7 +6,6 @@ import { trackViewContent } from "@/lib/tiktokEvents";
 import { metaTrackViewContent } from "@/lib/metaEvents";
 
 const DescriptionSection = lazy(() => import("@/components/DescriptionSection"));
-const SocialProofPopup = lazy(() => import("@/components/SocialProofPopup"));
 
 const LazySection = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<div className="min-h-[200px]" />}>{children}</Suspense>
@@ -28,7 +27,7 @@ const Index = () => {
 
         <LazySection><DescriptionSection /></LazySection>
       </main>
-      <LazySection><SocialProofPopup /></LazySection>
+      
     </div>
   );
 };
