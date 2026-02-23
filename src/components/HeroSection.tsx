@@ -13,6 +13,7 @@ import prod6 from "@/assets/prod6.png";
 import prod7 from "@/assets/prod7.png";
 import kitSem from "@/assets/kit-sem-portamalas.jpg";
 import kitCom from "@/assets/kit-com-portamalas.png";
+import seloRA from "@/assets/selo-ra.png";
 
 const productImages = [prod1, foto1, prod2, prod3, prod4, prod5, prod6, prod7];
 
@@ -214,6 +215,19 @@ const HeroSection = () => {
                   <p className="font-display font-bold text-base text-success">R$ 128,90</p>
                 </div>
               </button>
+            </div>
+
+            {/* Selo Reclame Aqui */}
+            <div className="flex items-center justify-center gap-3 bg-card border border-border rounded-xl px-4 py-3">
+              <img src={seloRA} alt="Selo Reclame Aqui" className="h-8 object-contain" loading="eager" width={32} height={32} />
+              <div className="h-8 w-px bg-border" />
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-bold text-sm text-foreground">8.7/10</span>
+                  <span className="bg-success text-primary-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">Ótimo</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground">+5.000 clientes satisfeitos</p>
+              </div>
             </div>
 
             {/* CTA */}
