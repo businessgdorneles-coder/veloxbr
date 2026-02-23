@@ -58,12 +58,12 @@ const HeroSection = () => {
   const nextImage = () => setCurrentImage((p) => (p === productImages.length - 1 ? 0 : p + 1));
 
   return (
-    <section id="produto" className="bg-background border-b border-border">
-      <div className="container max-w-6xl py-6 md:py-10">
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-10">
+    <section id="produto" className="bg-background border-b border-border overflow-hidden">
+      <div className="container max-w-6xl py-6 md:py-10 px-4">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-10 min-w-0">
           {/* LEFT: Gallery */}
-          <div>
-            <div className="relative rounded-2xl overflow-hidden border border-border bg-muted aspect-square mb-3">
+          <div className="min-w-0">
+            <div className="relative rounded-2xl overflow-hidden border border-border bg-muted aspect-square mb-3 max-w-full">
               <img
                 src={productImages[currentImage]}
                 alt="Tapete Bandeja 3D Premium"
@@ -102,7 +102,7 @@ const HeroSection = () => {
           {/* RIGHT: Product Info */}
           <div className="space-y-5">
             <div>
-              <h1 className="font-display font-bold text-xl md:text-2xl xl:text-3xl text-foreground leading-tight uppercase inline">
+              <h1 className="font-display font-bold text-lg md:text-2xl xl:text-3xl text-foreground leading-tight uppercase inline break-words">
                 Tapete Bandeja 3D Premium 5 Peças Incluso Porta Malas
               </h1>
               <BadgeCheck className="inline-block w-5 h-5 md:w-6 md:h-6 text-success ml-2 align-middle -mt-1" />
