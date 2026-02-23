@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect } from "react";
 import MarqueeBar from "@/components/MarqueeBar";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import TrustBar from "@/components/TrustBar";
 import { trackViewContent } from "@/lib/tiktokEvents";
 import { metaTrackViewContent } from "@/lib/metaEvents";
 
@@ -31,31 +30,28 @@ const Index = () => {
       <MarqueeBar />
       <Header />
       <main>
-        {/* 1. Hero = Product page (galeria + configurador) */}
+        {/* Product hero (galeria + configurador) */}
         <HeroSection />
 
-        {/* 2. Trust icons bar */}
-        <TrustBar />
-
-        {/* 3. Benefícios + Comparativo */}
+        {/* Benefícios + Comparativo */}
         <LazySection><BenefitsSection /></LazySection>
 
-        {/* 4. Apelo emocional */}
+        {/* Apelo emocional */}
         <LazySection><EmotionalSection /></LazySection>
 
-        {/* 5. Diferenciais técnicos */}
+        {/* Diferenciais técnicos */}
         <LazySection><FeaturesSection /></LazySection>
 
-        {/* 6. Stats + Features */}
+        {/* Stats */}
         <LazySection><StatsSection /></LazySection>
 
-        {/* 7. Especificações */}
+        {/* Especificações */}
         <LazySection><SpecsSection /></LazySection>
 
-        {/* 8. Avaliações */}
+        {/* Avaliações */}
         <LazySection><ReviewsSection /></LazySection>
 
-        {/* 9. FAQ */}
+        {/* FAQ */}
         <LazySection><FAQSection /></LazySection>
       </main>
       <LazySection><Footer /></LazySection>
