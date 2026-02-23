@@ -15,16 +15,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 10%;
 
-    --primary: 217 91% 50%;
+    --primary: 214 50% 18%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 94%;
-    --secondary-foreground: 220 25% 10%;
+    --secondary: 214 20% 94%;
+    --secondary-foreground: 214 50% 18%;
 
-    --muted: 220 15% 94%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 214 15% 94%;
+    --muted-foreground: 214 10% 45%;
 
-    --accent: 217 91% 50%;
+    --accent: 214 50% 18%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -32,13 +32,13 @@
 
     --border: 220 15% 90%;
     --input: 220 15% 90%;
-    --ring: 217 91% 50%;
+    --ring: 214 50% 18%;
 
     --radius: 0.75rem;
 
-    --hero-bg: 220 40% 8%;
+    --hero-bg: 214 50% 10%;
     --hero-foreground: 0 0% 100%;
-    --hero-accent: 217 91% 55%;
+    --hero-accent: 214 50% 22%;
 
     --trust-bg: 220 25% 96%;
     --badge-success: 142 71% 45%;
@@ -61,19 +61,19 @@
     --card-foreground: 210 40% 98%;
     --popover: 220 25% 9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 55%;
+    --primary: 214 50% 22%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 15%;
+    --secondary: 214 20% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 220 20% 15%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 91% 55%;
+    --muted: 214 20% 15%;
+    --muted-foreground: 214 20% 65%;
+    --accent: 214 50% 22%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     --border: 220 20% 18%;
     --input: 220 20% 18%;
-    --ring: 217 91% 55%;
+    --ring: 214 50% 22%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -97,36 +97,36 @@
 @layer utilities {
   .text-gradient-blue {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(217, 91%, 55%), hsl(200, 90%, 60%));
+    background-image: linear-gradient(135deg, hsl(214, 50%, 18%), hsl(214, 40%, 30%));
   }
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(38, 92%, 55%), hsl(45, 100%, 65%));
   }
   .bg-hero-dark {
-    background: linear-gradient(160deg, hsl(220, 45%, 5%) 0%, hsl(220, 40%, 10%) 50%, hsl(215, 50%, 8%) 100%);
+    background: linear-gradient(160deg, hsl(214, 50%, 6%) 0%, hsl(214, 50%, 10%) 50%, hsl(214, 45%, 8%) 100%);
   }
   .bg-hero-split {
-    background: linear-gradient(160deg, hsl(220, 45%, 5%) 0%, hsl(220, 40%, 10%) 100%);
+    background: linear-gradient(160deg, hsl(214, 50%, 6%) 0%, hsl(214, 50%, 10%) 100%);
   }
   .bg-section-alt {
     background: linear-gradient(180deg, hsl(220, 20%, 97%) 0%, hsl(220, 25%, 93%) 100%);
   }
   .bg-dark-section {
-    background: linear-gradient(160deg, hsl(220, 40%, 8%) 0%, hsl(220, 35%, 12%) 100%);
+    background: linear-gradient(160deg, hsl(214, 50%, 8%) 0%, hsl(214, 45%, 12%) 100%);
   }
   .shadow-blue {
-    box-shadow: 0 8px 30px -8px hsl(217 91% 50% / 0.35);
+    box-shadow: 0 8px 30px -8px hsl(214 50% 18% / 0.35);
   }
   .shadow-blue-lg {
-    box-shadow: 0 20px 60px -15px hsl(217 91% 50% / 0.4);
+    box-shadow: 0 20px 60px -15px hsl(214 50% 18% / 0.4);
   }
   .shadow-card {
-    box-shadow: 0 4px 24px -4px hsl(220 25% 20% / 0.12);
+    box-shadow: 0 4px 24px -4px hsl(214 25% 20% / 0.12);
   }
   .border-glow {
-    border: 1px solid hsl(217 91% 50% / 0.3);
-    box-shadow: 0 0 20px hsl(217 91% 50% / 0.08);
+    border: 1px solid hsl(214 50% 18% / 0.3);
+    box-shadow: 0 0 20px hsl(214 50% 18% / 0.08);
   }
   .animate-marquee {
     animation: marquee 30s linear infinite;
@@ -143,8 +143,8 @@
     animation: fade-up 0.6s ease-out forwards;
   }
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(217 91% 50% / 0.3); }
-    50% { box-shadow: 0 0 35px hsl(217 91% 50% / 0.55); }
+    0%, 100% { box-shadow: 0 0 20px hsl(214 50% 18% / 0.3); }
+    50% { box-shadow: 0 0 35px hsl(214 50% 18% / 0.55); }
   }
   .animate-pulse-glow {
     animation: pulse-glow 2.5s ease-in-out infinite;
