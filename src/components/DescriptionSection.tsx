@@ -139,19 +139,6 @@ const DescriptionSection = () => {
         </div>
       </section>
 
-      {/* Satisfação Garantida */}
-      <section className="py-10">
-        <div className="container max-w-5xl">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">✅ SATISFAÇÃO GARANTIDA</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-            {satisfacaoImages.map((img, i) => (
-              <div key={i} className="rounded-xl overflow-hidden border border-border">
-                <img src={img} alt={`Satisfação ${i + 1}`} className="w-full h-auto aspect-square object-cover" loading="lazy" decoding="async" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

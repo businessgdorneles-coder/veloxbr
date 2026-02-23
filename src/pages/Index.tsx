@@ -6,6 +6,7 @@ import { trackViewContent } from "@/lib/tiktokEvents";
 import { metaTrackViewContent } from "@/lib/metaEvents";
 
 const DescriptionSection = lazy(() => import("@/components/DescriptionSection"));
+const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
 
 const LazySection = ({ children }: { children: React.ReactNode }) => (
   <Suspense fallback={<div className="min-h-[200px]" />}>{children}</Suspense>
@@ -22,10 +23,9 @@ const Index = () => {
       <MarqueeBar />
       <Header />
       <main>
-        {/* Product hero (galeria + configurador) */}
         <HeroSection />
-
         <LazySection><DescriptionSection /></LazySection>
+        <LazySection><ReviewsSection /></LazySection>
       </main>
       
     </div>
