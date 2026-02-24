@@ -24,6 +24,7 @@ declare global {
       track: (event: string, params?: Record<string, unknown>) => void;
       page: () => void;
     };
+    fbq?: (...args: unknown[]) => void;
   }
 }
 
@@ -300,6 +301,7 @@ const Checkout = () => {
                 if (pixPollingRef.current) clearInterval(pixPollingRef.current);
                 setTransactionStatus("paid");
                 window.ttq?.track('CompletePayment', { content_type: 'product', value: priceInCents / 100, currency: 'BRL' });
+                window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
                 toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
                 supabase.functions.invoke("notify-sale", {
                   body: {
@@ -320,6 +322,7 @@ const Checkout = () => {
       } else if (data?.status === "paid" || data?.status === "authorized") {
         setTransactionStatus("paid");
         window.ttq?.track('CompletePayment', { content_type: 'product', value: priceInCents / 100, currency: 'BRL' });
+        window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
         supabase.functions.invoke("notify-sale", {
           body: {
@@ -506,6 +509,7 @@ const Checkout = () => {
                           value: priceInCents / 100,
                           currency: 'BRL',
                         });
+                        window.fbq?.('track', 'AddPaymentInfo', { value: priceInCents / 100, currency: 'BRL' });
                       }
                     }}
                     className="w-full bg-success text-primary-foreground font-bold py-3.5 rounded-lg text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all"
