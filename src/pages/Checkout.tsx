@@ -392,9 +392,15 @@ const Checkout = () => {
 
       {/* Info bar */}
       <div className="bg-primary border-b border-primary-foreground/10 overflow-hidden">
-        <p className="text-center text-primary-foreground/50 text-[9px] sm:text-[11px] font-light tracking-wide py-1.5 px-2 whitespace-nowrap">
-          O kit será enviado de acordo com o veículo informado na etapa anterior.
-        </p>
+        <div className="text-center py-2 px-2 space-y-0.5">
+          <p className="text-primary-foreground/50 text-[9px] sm:text-[11px] font-light tracking-wide whitespace-nowrap">
+            O kit será enviado de acordo com o veículo informado na etapa anterior.
+          </p>
+          <p className="text-primary-foreground/40 text-[8px] sm:text-[10px] font-light tracking-wide whitespace-nowrap flex items-center justify-center gap-1">
+            <Truck className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" />
+            Código de Rastreio enviado imediatamente após a compra.
+          </p>
+        </div>
       </div>
 
       {/* Main layout */}
