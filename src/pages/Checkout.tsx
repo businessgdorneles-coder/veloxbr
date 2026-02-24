@@ -5,8 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
 import logoCheckout from "@/assets/logo-veloxbr-checkout.png";
-import { trackInitiateCheckout, trackPurchase } from "@/lib/tiktokEvents";
-import { metaTrackInitiateCheckout, metaTrackPurchase } from "@/lib/metaEvents";
 import iconSsl from "@/assets/icon-ssl.png";
 
 declare global {
@@ -58,7 +56,7 @@ const Checkout = () => {
   // Steps
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
-  const initiateCheckoutFired = useRef(false);
+  
   const pixPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -182,22 +180,6 @@ const Checkout = () => {
     return true;
   };
 
-  // Fire InitiateCheckout when user reaches step 3
-  useEffect(() => {
-    if (currentStep === 3 && !initiateCheckoutFired.current) {
-      initiateCheckoutFired.current = true;
-      trackInitiateCheckout(
-        { email: email.trim() || undefined, phone: phone || undefined },
-        priceInCents / 100,
-        kitLabel
-      );
-      metaTrackInitiateCheckout(
-        { email: email.trim() || undefined, phone: phone || undefined },
-        priceInCents / 100,
-        kitLabel
-      );
-    }
-  }, [currentStep]);
 
   const handleFinalizePurchase = async () => {
     setIsProcessing(true);
@@ -314,16 +296,6 @@ const Checkout = () => {
                 if (pixPollingRef.current) clearInterval(pixPollingRef.current);
                 setTransactionStatus("paid");
                 toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
-                trackPurchase(
-                  { email: email.trim() || undefined, phone: phone || undefined },
-                  priceInCents / 100,
-                  kitLabel
-                );
-                metaTrackPurchase(
-                  { email: email.trim() || undefined, phone: phone || undefined },
-                  priceInCents / 100,
-                  kitLabel
-                );
                 supabase.functions.invoke("notify-sale", {
                   body: {
                     customerName: name.trim(),
@@ -343,16 +315,6 @@ const Checkout = () => {
       } else if (data?.status === "paid" || data?.status === "authorized") {
         setTransactionStatus("paid");
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
-        trackPurchase(
-          { email: email.trim() || undefined, phone: phone || undefined },
-          priceInCents / 100,
-          kitLabel
-        );
-        metaTrackPurchase(
-          { email: email.trim() || undefined, phone: phone || undefined },
-          priceInCents / 100,
-          kitLabel
-        );
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
