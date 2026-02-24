@@ -355,7 +355,7 @@ const Checkout = () => {
   // Success screen
   if (transactionStatus === "paid") {
     return (
-      <div className="min-h-screen bg-muted/30 flex items-center justify-center">
+      <div className="min-h-screen bg-muted/30 flex items-center justify-center" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
         <div className="bg-background rounded-2xl border border-border p-8 max-w-md text-center">
           <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-success" />
@@ -373,7 +373,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
+    <div className="min-h-screen bg-muted/30 flex flex-col" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
       {/* Header */}
       <header className="bg-primary border-b border-primary-foreground/10 py-3">
         <div className="container flex items-center justify-between max-w-6xl">
