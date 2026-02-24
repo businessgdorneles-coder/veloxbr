@@ -1,15 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check } from "lucide-react";
+import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
-import checkoutBanner from "@/assets/checkout-banner.png";
+import logoCheckout from "@/assets/logo-veloxbr-checkout.png";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/tiktokEvents";
 import { metaTrackInitiateCheckout, metaTrackPurchase } from "@/lib/metaEvents";
-
-
-// Will be fetched from backend
+import iconSsl from "@/assets/icon-ssl.png";
 
 declare global {
   interface Window {
@@ -57,28 +55,17 @@ const Checkout = () => {
     });
   }, []);
 
-  // Countdown timer (12 minutes)
-  const [timeLeft, setTimeLeft] = useState(12 * 60);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-      if (pixPollingRef.current) clearInterval(pixPollingRef.current);
-    };
-  }, []);
-
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `00:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-  };
-
   // Steps
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const initiateCheckoutFired = useRef(false);
+  const pixPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (pixPollingRef.current) clearInterval(pixPollingRef.current);
+    };
+  }, []);
 
   // Step 1
   const [name, setName] = useState("");
@@ -107,7 +94,6 @@ const Checkout = () => {
   // PIX result
   const [pixData, setPixData] = useState<{ qrcode: string; url: string; transactionId?: string } | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
-  const pixPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
@@ -130,7 +116,6 @@ const Checkout = () => {
   const cleanCpf = (c: string) => c.replace(/\D/g, "");
   const cleanCep = (c: string) => c.replace(/\D/g, "");
 
-  // Format CPF as user types
   const formatCpf = (value: string) => {
     const nums = value.replace(/\D/g, "").slice(0, 11);
     if (nums.length <= 3) return nums;
@@ -139,7 +124,6 @@ const Checkout = () => {
     return `${nums.slice(0, 3)}.${nums.slice(3, 6)}.${nums.slice(6, 9)}-${nums.slice(9)}`;
   };
 
-  // Format phone
   const formatPhone = (value: string) => {
     const nums = value.replace(/\D/g, "").slice(0, 11);
     if (nums.length <= 2) return `(${nums}`;
@@ -147,7 +131,6 @@ const Checkout = () => {
     return `(${nums.slice(0, 2)}) ${nums.slice(2, 7)}-${nums.slice(7)}`;
   };
 
-  // CEP auto-fill
   const handleCepChange = async (value: string) => {
     const formatted = value.replace(/\D/g, "").slice(0, 8);
     setCep(formatted.length > 5 ? `${formatted.slice(0, 5)}-${formatted.slice(5)}` : formatted);
@@ -229,7 +212,6 @@ const Checkout = () => {
           return;
         }
 
-        // Tokenize card via Beehive JS SDK
         if (!window.BeehivePay) {
           toast({ title: "Erro ao carregar gateway de pagamento", description: "Recarregue a página e tente novamente.", variant: "destructive" });
           setIsProcessing(false);
@@ -237,7 +219,6 @@ const Checkout = () => {
         }
 
         window.BeehivePay.setPublicKey(beehivePublicKey);
-        // Set to false for production
         window.BeehivePay.setTestMode(false);
 
         const [expMonth, expYear] = cardExpiry.split("/").map((v) => parseInt(v.trim(), 10));
@@ -312,7 +293,6 @@ const Checkout = () => {
         const transactionId = data?.id || data?.transactionId;
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
-        // Notify sale via Pushcut (PIX gerado)
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -324,7 +304,6 @@ const Checkout = () => {
           },
         });
 
-        // Start polling for PIX payment confirmation
         if (transactionId) {
           pixPollingRef.current = setInterval(async () => {
             try {
@@ -345,7 +324,6 @@ const Checkout = () => {
                   priceInCents / 100,
                   kitLabel
                 );
-                // Notify PIX paid via Pushcut
                 supabase.functions.invoke("notify-sale", {
                   body: {
                     customerName: name.trim(),
@@ -365,7 +343,6 @@ const Checkout = () => {
       } else if (data?.status === "paid" || data?.status === "authorized") {
         setTransactionStatus("paid");
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
-        // Fire Purchase event (server-side + pixel)
         trackPurchase(
           { email: email.trim() || undefined, phone: phone || undefined },
           priceInCents / 100,
@@ -376,7 +353,6 @@ const Checkout = () => {
           priceInCents / 100,
           kitLabel
         );
-        // Notify sale via Pushcut
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -409,9 +385,9 @@ const Checkout = () => {
   };
 
   const testimonials = [
-    { name: "Pedro Álvares", text: "Foi minha primeira compra na CarpetCar para revender e fiquei muito satisfeito. Produtos de ótima qualidade." },
-    { name: "Marco da Silva", text: "Já é minha segunda compra na CarpetCar e recomendo muito. O carpete veio sob medida e encaixou perfeito." },
-    { name: "Tulio Vasconcelos", text: "Excelente experiência com a CarpetCar. Produto igual ao anúncio e acabamento impecável." },
+    { name: "Lucas Almeida", text: "Fiquei na dúvida antes de comprar, mas a Velox me surpreendeu! Tapete de altíssima qualidade. Recomendo!" },
+    { name: "Mariana Costa", text: "Estava com um pé atrás, mas a Velox entregou tudo certinho e rápido. Produto incrível, loja confiável!" },
+    { name: "Tulio Vasconcelos", text: "Pensei duas vezes antes de comprar online, mas valeu muito a pena. Encaixe perfeito e acabamento impecável." },
   ];
 
   // Success screen
@@ -435,40 +411,47 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 flex flex-col">
       {/* Header */}
-      <header className="bg-background border-b border-border py-3">
+      <header className="bg-primary border-b border-primary-foreground/10 py-3">
         <div className="container flex items-center justify-between max-w-6xl">
-          <h1 className="font-display text-xl font-bold text-primary">CARPETCAR</h1>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <a href="/">
+            <img src={logoCheckout} alt="VeloxBR" className="h-8 sm:h-10 object-contain" />
+          </a>
+          <div className="flex items-center gap-1.5 text-xs text-primary-foreground/70">
             <Lock className="w-4 h-4" />
             <div className="text-right">
-              <p className="font-bold text-foreground text-xs">PAGAMENTO</p>
+              <p className="font-bold text-primary-foreground text-xs">PAGAMENTO</p>
               <p className="text-[10px]">100% SEGURO</p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Banner */}
-      <div className="w-full">
-        <img
-          src={checkoutBanner}
-          alt="CarpetCar - Frete Grátis Hoje - Encaixe perfeito no seu carro - Compra Segura"
-          className="w-full h-auto object-cover"
-          loading="eager"
-          fetchPriority="high"
-        />
-      </div>
-
-      {/* Timer */}
-      <div className="text-center py-4">
-        <span className="text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full mr-2 font-semibold uppercase">Tempo restante</span>
-        <span className="font-display text-2xl font-bold text-foreground">{formatTime(timeLeft)}</span>
+      {/* Trust bar */}
+      <div className="bg-primary/95 border-b border-primary-foreground/10">
+        <div className="container max-w-6xl flex items-center justify-center gap-6 sm:gap-10 py-2.5 flex-wrap">
+          <div className="flex items-center gap-1.5 text-primary-foreground/80 text-[11px]">
+            <ShieldCheck className="w-3.5 h-3.5 text-success" />
+            <span>Compra Segura</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-primary-foreground/80 text-[11px]">
+            <Truck className="w-3.5 h-3.5 text-success" />
+            <span>Frete Grátis</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-primary-foreground/80 text-[11px]">
+            <RotateCcw className="w-3.5 h-3.5 text-success" />
+            <span>7 Dias de Troca</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-primary-foreground/80 text-[11px]">
+            <Headphones className="w-3.5 h-3.5 text-success" />
+            <span>Suporte Dedicado</span>
+          </div>
+        </div>
       </div>
 
       {/* Main layout */}
-      <div className="container max-w-6xl pb-16">
+      <div className="container max-w-6xl pb-8 pt-6 flex-1">
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
           {/* Left - Form Steps */}
           <div className="space-y-4">
@@ -648,10 +631,9 @@ const Checkout = () => {
                             <select value={installments} onChange={(e) => setInstallments(Number(e.target.value))} className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background">
                               {[...Array(3)].map((_, i) => {
                                 const n = i + 1;
-                                const taxaMensal = 0.0299; // ~2.99% a.m. estimativa padrão
+                                const taxaMensal = 0.0299;
                                 let totalComJuros = priceInCents / 100;
                                 if (n > 1) {
-                                  // Juros compostos: PMT = PV * [i(1+i)^n] / [(1+i)^n - 1]
                                   const fator = Math.pow(1 + taxaMensal, n);
                                   const pmt = (priceInCents / 100) * (taxaMensal * fator) / (fator - 1);
                                   totalComJuros = pmt * n;
@@ -680,9 +662,18 @@ const Checkout = () => {
                             Processando...
                           </>
                         ) : (
-                          "Finalizar compra"
+                          <>
+                            <Lock className="w-4 h-4" />
+                            Finalizar compra
+                          </>
                         )}
                       </button>
+
+                      {/* SSL trust indicator below button */}
+                      <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                        <img src={iconSsl} alt="SSL" className="h-5 object-contain opacity-60" />
+                        <span className="text-[10px]">Ambiente seguro com criptografia SSL</span>
+                      </div>
                     </>
                   )}
                 </div>
@@ -706,7 +697,11 @@ const Checkout = () => {
                   <span className="text-success font-bold">– R$ {discountFormatted}</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm mb-4 border-b border-border pb-4">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="font-semibold text-success">Frete</span>
+                <span className="text-success font-bold">Grátis</span>
+              </div>
+              <div className="flex justify-between text-sm mb-4 border-b border-border pb-4 mt-2">
                 <span className="font-semibold text-success">Total</span>
                 <span className="font-bold text-success text-lg">R$ {priceFormatted}</span>
               </div>
@@ -722,13 +717,56 @@ const Checkout = () => {
               </div>
             </div>
 
+            {/* Trust badges */}
+            <div className="bg-background rounded-xl border border-border p-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                    <ShieldCheck className="w-4 h-4 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Compra Segura</p>
+                    <p className="text-[10px] text-muted-foreground">Dados protegidos</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                    <Truck className="w-4 h-4 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Frete Grátis</p>
+                    <p className="text-[10px] text-muted-foreground">Todo o Brasil</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                    <RotateCcw className="w-4 h-4 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Troca Garantida</p>
+                    <p className="text-[10px] text-muted-foreground">Até 7 dias</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                    <BadgeCheck className="w-4 h-4 text-success" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold">Loja Verificada</p>
+                    <p className="text-[10px] text-muted-foreground">CNPJ ativo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Testimonials */}
             <div className="bg-background rounded-xl border border-border p-6 space-y-4">
+              <h4 className="font-display font-bold text-sm uppercase text-muted-foreground">O que nossos clientes dizem</h4>
               {testimonials.map((t, i) => (
                 <div key={i} className={`${i > 0 ? "border-t border-border pt-4" : ""}`}>
                   <div className="flex gap-1 mb-1">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-4 h-4 fill-warning text-warning" />
+                      <Star key={j} className="w-3.5 h-3.5 fill-warning text-warning" />
                     ))}
                   </div>
                   <p className="font-bold text-sm">{t.name}</p>
@@ -745,6 +783,49 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {/* Professional Footer */}
+      <footer className="bg-primary text-primary-foreground/70 mt-auto">
+        <div className="container max-w-6xl py-8">
+          <div className="grid sm:grid-cols-3 gap-6 text-center sm:text-left">
+            <div>
+              <img src={logoCheckout} alt="VeloxBR" className="h-7 object-contain mx-auto sm:mx-0 mb-3" />
+              <p className="text-[11px] leading-relaxed">
+                Tapetes automotivos sob medida com a mais alta qualidade do mercado. Encaixe perfeito garantido.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-primary-foreground text-xs uppercase tracking-wider mb-3">Dados da Loja</h4>
+              <div className="space-y-1.5 text-[11px]">
+                <p>Velox Centro Automotivo LTDA</p>
+                <p>CNPJ: 64.809.798/0001-08</p>
+                <p>São Paulo - SP</p>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-bold text-primary-foreground text-xs uppercase tracking-wider mb-3">Atendimento</h4>
+              <div className="space-y-1.5 text-[11px]">
+                <p>(11) 97400-4406</p>
+                <p>WhatsApp disponível</p>
+                <p>Seg. a Sex. 9h às 18h</p>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-primary-foreground/10 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-[10px]">© {new Date().getFullYear()} VeloxBR — Todos os direitos reservados</p>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <BadgeCheck className="w-3.5 h-3.5 text-success" />
+                <span className="text-[10px]">Loja Verificada</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-success" />
+                <span className="text-[10px]">Site Seguro SSL</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
