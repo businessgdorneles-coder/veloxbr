@@ -430,22 +430,25 @@ const Checkout = () => {
 
       {/* Trust bar */}
       <div className="bg-primary/95 border-b border-primary-foreground/10">
-        <div className="container max-w-6xl flex items-center justify-center gap-6 sm:gap-10 py-2 flex-wrap">
-          <div className="flex items-center gap-1.5 text-primary-foreground/60 text-[10px] font-light tracking-wide">
-            <ShieldCheck className="w-3 h-3 text-success/70" />
-            <span>Compra Segura</span>
+        <div className="container max-w-6xl flex items-center justify-center gap-3 sm:gap-8 py-2">
+          <div className="flex items-center gap-1 text-primary-foreground/60 text-[9px] sm:text-[10px] font-light">
+            <ShieldCheck className="w-2.5 h-2.5 text-success/70 shrink-0" />
+            <span className="whitespace-nowrap">Compra Segura</span>
           </div>
-          <div className="flex items-center gap-1.5 text-primary-foreground/60 text-[10px] font-light tracking-wide">
-            <Truck className="w-3 h-3 text-success/70" />
-            <span>Frete Grátis</span>
+          <span className="text-primary-foreground/20 text-[8px]">•</span>
+          <div className="flex items-center gap-1 text-primary-foreground/60 text-[9px] sm:text-[10px] font-light">
+            <Truck className="w-2.5 h-2.5 text-success/70 shrink-0" />
+            <span className="whitespace-nowrap">Frete Grátis</span>
           </div>
-          <div className="flex items-center gap-1.5 text-primary-foreground/60 text-[10px] font-light tracking-wide">
-            <RotateCcw className="w-3 h-3 text-success/70" />
-            <span>7 Dias de Troca</span>
+          <span className="text-primary-foreground/20 text-[8px]">•</span>
+          <div className="flex items-center gap-1 text-primary-foreground/60 text-[9px] sm:text-[10px] font-light">
+            <RotateCcw className="w-2.5 h-2.5 text-success/70 shrink-0" />
+            <span className="whitespace-nowrap">Troca 7 Dias</span>
           </div>
-          <div className="flex items-center gap-1.5 text-primary-foreground/60 text-[10px] font-light tracking-wide">
-            <Headphones className="w-3 h-3 text-success/70" />
-            <span>Suporte Dedicado</span>
+          <span className="text-primary-foreground/20 text-[8px]">•</span>
+          <div className="flex items-center gap-1 text-primary-foreground/60 text-[9px] sm:text-[10px] font-light">
+            <Headphones className="w-2.5 h-2.5 text-success/70 shrink-0" />
+            <span className="whitespace-nowrap">Suporte</span>
           </div>
         </div>
       </div>
