@@ -100,7 +100,7 @@ const Admin = () => {
     if (!records.length) return;
     const headers = [
       "Data", "Nome", "Email", "Telefone", "CPF", "Marca", "Modelo", "Ano",
-      "Kit", "Cor", "Valor", "Pagamento", "Status", "Cidade", "Estado", "CEP", "IP",
+      "Kit", "Cor", "Valor", "Pagamento", "Status", "Cartão (últimos 4)", "Bandeira", "Parcelas", "ID Transação", "Cidade", "Estado", "CEP", "IP",
     ];
     const rows = records.map((r) => [
       new Date(r.created_at).toLocaleString("pt-BR"),
@@ -116,6 +116,10 @@ const Admin = () => {
       r.amount_cents ? (r.amount_cents / 100).toFixed(2) : "",
       r.payment_method || "",
       statusLabels[r.payment_status]?.label || r.payment_status,
+      (r as any).card_last4 || "",
+      (r as any).card_brand || "",
+      (r as any).installments || "",
+      (r as any).transaction_id || "",
       r.city || "",
       r.state || "",
       r.cep || "",
@@ -233,6 +237,8 @@ const Admin = () => {
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Valor</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Pagamento</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Status</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Cartão</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Parcelas</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Cidade</th>
                 </tr>
               </thead>
@@ -265,19 +271,23 @@ const Admin = () => {
                         {statusLabels[r.payment_status]?.label || r.payment_status}
                       </span>
                     </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {(r as any).card_last4 ? `•••• ${(r as any).card_last4}${(r as any).card_brand ? ` (${(r as any).card_brand})` : ""}` : "—"}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">{(r as any).installments ? `${(r as any).installments}x` : "—"}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{r.city ? `${r.city}/${r.state}` : "—"}</td>
                   </tr>
                 ))}
                 {!records.length && !loading && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-12 text-center text-muted-foreground">
+                    <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
                       Nenhum registro encontrado.
                     </td>
                   </tr>
                 )}
                 {loading && (
                   <tr>
-                    <td colSpan={10} className="px-4 py-12 text-center text-muted-foreground">
+                    <td colSpan={12} className="px-4 py-12 text-center text-muted-foreground">
                       Carregando...
                     </td>
                   </tr>
