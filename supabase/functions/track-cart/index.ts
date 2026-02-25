@@ -55,6 +55,7 @@ serve(async (req) => {
       selected_color, selected_kit, selected_texture,
       product_title, amount_cents, payment_method,
       payment_status, cep, city, state, address, user_agent,
+      card_last4, card_brand, installments: installmentsVal, transaction_id,
     } = body;
 
     // Get IP from headers
@@ -97,6 +98,10 @@ serve(async (req) => {
     if (state !== undefined) record.state = state;
     if (address !== undefined) record.address = address;
     if (user_agent !== undefined) record.user_agent = user_agent;
+    if (card_last4 !== undefined) record.card_last4 = card_last4;
+    if (card_brand !== undefined) record.card_brand = card_brand;
+    if (installmentsVal !== undefined) record.installments = installmentsVal;
+    if (transaction_id !== undefined) record.transaction_id = transaction_id;
 
     let result;
     if (existing) {
