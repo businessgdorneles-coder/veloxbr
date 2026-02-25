@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.track-cart]
 verify_jwt = false
+
+[functions.utmify-sale]
+verify_jwt = false

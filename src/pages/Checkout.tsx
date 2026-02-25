@@ -133,6 +133,44 @@ const Checkout = () => {
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
 
+  // UTM parameters for UTMify tracking
+  const utmParams = (() => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      src: params.get("src"),
+      sck: params.get("sck"),
+      utm_source: params.get("utm_source"),
+      utm_campaign: params.get("utm_campaign"),
+      utm_medium: params.get("utm_medium"),
+      utm_content: params.get("utm_content"),
+      utm_term: params.get("utm_term"),
+    };
+  })();
+
+  const sendUtmifyEvent = (status: string, approvedDate?: string) => {
+    const orderId = `VELOX-${Date.now()}`;
+    supabase.functions.invoke("utmify-sale", {
+      body: {
+        orderId,
+        paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
+        status,
+        customer: {
+          name: name.trim(),
+          email: email.trim(),
+          phone: cleanPhone(phone),
+          document: cleanCpf(cpf),
+        },
+        product: {
+          id: orderData?.selectedKit === "completo" ? "kit-completo" : "kit-interno",
+          name: kitLabel,
+        },
+        priceInCents,
+        approvedDate: approvedDate || null,
+        trackingParameters: utmParams,
+      },
+    }).catch(() => {});
+  };
+
   const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
   const PIX_DISCOUNT = 0.05;
   const priceInCents = paymentMethod === "pix"
@@ -317,6 +355,7 @@ const Checkout = () => {
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
         trackCart({ payment_status: "pix_generated" });
+        sendUtmifyEvent("waiting_payment");
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -374,7 +413,9 @@ const Checkout = () => {
                     },
                   }).catch(() => {});
                   toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
-                  trackCart({ payment_status: "paid" });
+        trackCart({ payment_status: "paid" });
+        sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
+                  sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
                   supabase.functions.invoke("notify-sale", {
                     body: {
                       customerName: name.trim(),
