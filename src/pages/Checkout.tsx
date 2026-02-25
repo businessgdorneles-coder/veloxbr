@@ -795,7 +795,10 @@ const Checkout = () => {
                         <div className="space-y-3">
                           <div>
                             <label className="text-sm font-semibold block mb-1">Número do cartão</label>
-                            <input value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} placeholder="0000 0000 0000 0000" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={19} />
+                            <input value={cardNumber} onChange={(e) => {
+                              const nums = e.target.value.replace(/\D/g, "").slice(0, 16);
+                              setCardNumber(nums.replace(/(.{4})/g, "$1 ").trim());
+                            }} placeholder="0000 0000 0000 0000" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={19} />
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
