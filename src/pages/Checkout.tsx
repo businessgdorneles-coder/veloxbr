@@ -189,7 +189,14 @@ const Checkout = () => {
       },
       body: JSON.stringify(payload),
       keepalive: true,
-    }).catch((err) => console.error("UTMify event failed:", err));
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        console.log(`✅ UTMify [${status}] orderId=${payload.orderId}`, data);
+      } else {
+        console.error(`❌ UTMify [${status}] orderId=${payload.orderId} HTTP ${res.status}`, data);
+      }
+    }).catch((err) => console.error("❌ UTMify network error:", err));
   };
 
   const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
