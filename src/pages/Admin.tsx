@@ -26,6 +26,9 @@ interface CartRecord {
   city: string | null;
   state: string | null;
   address: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -100,7 +103,7 @@ const Admin = () => {
     if (!records.length) return;
     const headers = [
       "Data", "Nome", "Email", "Telefone", "CPF", "Marca", "Modelo", "Ano",
-      "Kit", "Cor", "Valor", "Pagamento", "Status", "Cidade", "Estado", "CEP", "IP",
+      "Kit", "Cor", "Valor", "Pagamento", "Status", "Origem", "Cidade", "Estado", "CEP", "IP",
     ];
     const rows = records.map((r) => [
       new Date(r.created_at).toLocaleString("pt-BR"),
@@ -116,6 +119,7 @@ const Admin = () => {
       r.amount_cents ? (r.amount_cents / 100).toFixed(2) : "",
       r.payment_method || "",
       statusLabels[r.payment_status]?.label || r.payment_status,
+      r.utm_source || "",
       r.city || "",
       r.state || "",
       r.cep || "",
@@ -233,6 +237,7 @@ const Admin = () => {
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Valor</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Pagamento</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Status</th>
+                  <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Origem</th>
                   <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Cidade</th>
                 </tr>
               </thead>
@@ -264,6 +269,11 @@ const Admin = () => {
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusLabels[r.payment_status]?.color || "bg-gray-100 text-gray-700"}`}>
                         {statusLabels[r.payment_status]?.label || r.payment_status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {r.utm_source ? (
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-muted text-muted-foreground capitalize">{r.utm_source}</span>
+                      ) : "—"}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">{r.city ? `${r.city}/${r.state}` : "—"}</td>
                   </tr>
