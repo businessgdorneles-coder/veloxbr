@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones } from "lucide-react";
+import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
 import logoCheckout from "@/assets/logo-veloxbr-checkout.png";
 import iconSsl from "@/assets/icon-ssl.png";
+import seloRA from "@/assets/selo-ra.png";
 
 declare global {
   interface Window {
@@ -541,31 +542,56 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-muted/30 flex flex-col" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
       {/* Header */}
-      <header className="bg-primary border-b border-primary-foreground/10 py-3">
+      <header className="bg-primary py-3">
         <div className="container flex items-center justify-between max-w-6xl">
           <a href="/">
             <img src={logoCheckout} alt="VeloxBR" className="h-8 sm:h-10 object-contain" />
           </a>
-          <div className="flex items-center gap-1.5 text-primary-foreground/50">
-            <Lock className="w-3.5 h-3.5" />
-            <div className="text-right">
-              <p className="font-light text-primary-foreground/80 text-[10px] tracking-widest uppercase">Pagamento</p>
-              <p className="text-[9px] font-light tracking-wider">100% Seguro</p>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-1.5 text-primary-foreground/60 text-[10px]">
+              <BadgeCheck className="w-3.5 h-3.5 text-success" />
+              <span>Loja Verificada</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-primary-foreground/60">
+              <Lock className="w-3.5 h-3.5" />
+              <div className="text-right">
+                <p className="text-[10px] font-medium tracking-wider uppercase">Pagamento 100% Seguro</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Info bar */}
-      <div className="bg-primary border-b border-primary-foreground/10 overflow-hidden">
-        <div className="text-center py-2 px-2 space-y-0.5">
-          <p className="text-primary-foreground/50 text-[9px] sm:text-[11px] font-light tracking-wide whitespace-nowrap">
-            O kit será enviado de acordo com o veículo informado na etapa anterior.
-          </p>
-          <p className="text-primary-foreground/40 text-[8px] sm:text-[10px] font-light tracking-wide whitespace-nowrap flex items-center justify-center gap-1">
-            <Truck className="w-2.5 h-2.5 sm:w-3 sm:h-3 shrink-0" />
-            Código de Rastreio enviado imediatamente após a compra.
-          </p>
+      {/* Step Progress Bar */}
+      <div className="bg-primary border-b border-primary-foreground/10">
+        <div className="container max-w-6xl py-2.5">
+          <div className="flex items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
+            {[
+              { step: 1, label: "Identificação" },
+              { step: 2, label: "Entrega" },
+              { step: 3, label: "Pagamento" },
+            ].map((s, i) => (
+              <div key={s.step} className="flex items-center gap-2 sm:gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                    currentStep >= s.step
+                      ? "bg-success text-primary-foreground"
+                      : "bg-primary-foreground/15 text-primary-foreground/50"
+                  }`}>
+                    {currentStep > s.step ? <Check className="w-3 h-3" /> : s.step}
+                  </span>
+                  <span className={`hidden sm:inline font-medium transition-all ${
+                    currentStep >= s.step ? "text-primary-foreground" : "text-primary-foreground/40"
+                  }`}>{s.label}</span>
+                </div>
+                {i < 2 && (
+                  <div className={`w-6 sm:w-10 h-0.5 rounded transition-all ${
+                    currentStep > s.step ? "bg-success" : "bg-primary-foreground/15"
+                  }`} />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -834,100 +860,113 @@ const Checkout = () => {
 
           {/* Right - Summary Sidebar */}
           <div className="space-y-4">
+            {/* Order Summary */}
             <div className="bg-background rounded-xl border border-border p-6">
-              <h3 className="font-display font-bold text-lg mb-4 uppercase">Resumo</h3>
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold">Produto</span>
-                <span className={paymentMethod === "pix" ? "line-through text-muted-foreground" : ""}>R$ {basePriceFormatted}</span>
-              </div>
-              {paymentMethod === "pix" && (
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="font-semibold text-success">Desconto PIX (5%)</span>
-                  <span className="text-success font-bold">– R$ {discountFormatted}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-sm mb-1">
-                <span className="font-semibold text-success">Frete</span>
-                <span className="text-success font-bold">Grátis</span>
-              </div>
-              <div className="flex justify-between text-sm mb-4 border-b border-border pb-4 mt-2">
-                <span className="font-semibold text-success">Total</span>
-                <span className="font-bold text-success text-lg">R$ {priceFormatted}</span>
-              </div>
-              <div className="flex gap-3 items-start">
-                <img src={prod1} alt="Produto" className="w-16 h-16 rounded-lg object-cover" />
+              <h3 className="font-display font-bold text-lg mb-4 uppercase">Resumo do Pedido</h3>
+              <div className="flex gap-3 items-start mb-4 pb-4 border-b border-border">
+                <img src={prod1} alt="Produto" className="w-16 h-16 rounded-lg object-cover border border-border" />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">{kitLabel} – {colorLabel}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Qtd.: 1 &nbsp; R$ {priceFormatted}</p>
+                  <p className="text-sm font-semibold leading-tight">{kitLabel} – {colorLabel}</p>
                   {orderData?.brand && (
                     <p className="text-xs text-muted-foreground mt-1">{orderData.brand} {orderData.model} ({orderData.year})</p>
                   )}
+                  <p className="text-xs text-muted-foreground mt-0.5">Qtd.: 1</p>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Subtotal</span>
+                  <span className={paymentMethod === "pix" ? "line-through text-muted-foreground" : ""}>R$ {basePriceFormatted}</span>
+                </div>
+                {paymentMethod === "pix" && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-success font-medium">Desconto PIX (5%)</span>
+                    <span className="text-success font-bold">– R$ {discountFormatted}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-success font-medium">Frete</span>
+                  <span className="text-success font-bold">Grátis</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-border">
+                <span className="font-bold text-base">Total</span>
+                <span className="font-bold text-success text-xl">R$ {priceFormatted}</span>
               </div>
             </div>
 
-            {/* Trust badges */}
+            {/* Reclame Aqui + Trust Seals */}
             <div className="bg-background rounded-xl border border-border p-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
-                    <ShieldCheck className="w-4 h-4 text-success" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold">Compra Segura</p>
-                    <p className="text-[10px] text-muted-foreground">Dados protegidos</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
-                    <Truck className="w-4 h-4 text-success" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold">Frete Grátis</p>
-                    <p className="text-[10px] text-muted-foreground">Todo o Brasil</p>
+              <div className="flex items-center gap-3 mb-4 pb-4 border-b border-border">
+                <img src={seloRA} alt="Selo Reclame Aqui" className="h-12 object-contain" />
+                <div>
+                  <p className="text-xs font-bold">Reclame Aqui</p>
+                  <p className="text-[10px] text-muted-foreground">+5.000 clientes satisfeitos</p>
+                  <div className="flex gap-0.5 mt-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-2.5 h-2.5 fill-warning text-warning" />
+                    ))}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
-                    <RotateCcw className="w-4 h-4 text-success" />
-                  </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                  <ShieldCheck className="w-5 h-5 text-success shrink-0" />
                   <div>
-                    <p className="text-xs font-bold">Troca Garantida</p>
-                    <p className="text-[10px] text-muted-foreground">Até 7 dias</p>
+                    <p className="text-[11px] font-bold leading-tight">Compra Segura</p>
+                    <p className="text-[9px] text-muted-foreground">Dados criptografados</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
-                    <BadgeCheck className="w-4 h-4 text-success" />
-                  </div>
+                <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                  <Truck className="w-5 h-5 text-success shrink-0" />
                   <div>
-                    <p className="text-xs font-bold">Loja Verificada</p>
-                    <p className="text-[10px] text-muted-foreground">CNPJ ativo</p>
+                    <p className="text-[11px] font-bold leading-tight">Frete Grátis</p>
+                    <p className="text-[9px] text-muted-foreground">Todo o Brasil</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                  <RotateCcw className="w-5 h-5 text-success shrink-0" />
+                  <div>
+                    <p className="text-[11px] font-bold leading-tight">Troca Garantida</p>
+                    <p className="text-[9px] text-muted-foreground">Até 7 dias</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
+                  <BadgeCheck className="w-5 h-5 text-success shrink-0" />
+                  <div>
+                    <p className="text-[11px] font-bold leading-tight">Loja Verificada</p>
+                    <p className="text-[9px] text-muted-foreground">CNPJ ativo</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Testimonials */}
-            <div className="bg-background rounded-xl border border-border p-6 space-y-4">
-              <h4 className="font-display font-bold text-sm uppercase text-muted-foreground">O que nossos clientes dizem</h4>
+            <div className="bg-background rounded-xl border border-border p-5 space-y-3">
+              <h4 className="font-display font-bold text-xs uppercase text-muted-foreground tracking-wider">Avaliações de clientes</h4>
               {testimonials.map((t, i) => (
-                <div key={i} className={`${i > 0 ? "border-t border-border pt-4" : ""}`}>
-                  <div className="flex gap-1 mb-1">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-3.5 h-3.5 fill-warning text-warning" />
-                    ))}
+                <div key={i} className={`${i > 0 ? "border-t border-border pt-3" : ""}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                      <span className="text-primary-foreground text-[10px] font-bold">{t.name.charAt(0)}</span>
+                    </div>
+                    <p className="font-bold text-xs">{t.name}</p>
+                    <div className="flex gap-0.5 ml-auto">
+                      {[...Array(5)].map((_, j) => (
+                        <Star key={j} className="w-2.5 h-2.5 fill-warning text-warning" />
+                      ))}
+                    </div>
                   </div>
-                  <p className="font-bold text-sm">{t.name}</p>
-                  <p className="text-xs text-muted-foreground mt-1">"{t.text}"</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed pl-8">"{t.text}"</p>
                 </div>
               ))}
             </div>
 
-            {/* Payment methods */}
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground font-semibold mb-2">Formas de pagamento</p>
-              <p className="text-xs text-muted-foreground">PIX • Cartão de Crédito</p>
+            {/* SSL + Payment */}
+            <div className="flex items-center justify-center gap-4 py-2">
+              <img src={iconSsl} alt="SSL" className="h-6 object-contain opacity-50" />
+              <div className="h-4 w-px bg-border" />
+              <p className="text-[10px] text-muted-foreground">PIX • Cartão de Crédito</p>
             </div>
           </div>
         </div>
@@ -935,34 +974,14 @@ const Checkout = () => {
 
       {/* Professional Footer */}
       <footer className="bg-primary text-primary-foreground/70 mt-auto">
-        <div className="container max-w-6xl py-8">
-          <div className="grid sm:grid-cols-3 gap-6 text-center sm:text-left">
-            <div>
-              <img src={logoCheckout} alt="VeloxBR" className="h-7 object-contain mx-auto sm:mx-0 mb-3" />
-              <p className="text-[11px] leading-relaxed">
-                Tapetes automotivos sob medida com a mais alta qualidade do mercado. Encaixe perfeito garantido.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold text-primary-foreground text-xs uppercase tracking-wider mb-3">Dados da Loja</h4>
-              <div className="space-y-1.5 text-[11px]">
-                <p>Velox Centro Automotivo LTDA</p>
-                <p>CNPJ: 64.809.798/0001-08</p>
-                <p>São Paulo - SP</p>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold text-primary-foreground text-xs uppercase tracking-wider mb-3">Atendimento</h4>
-              <div className="space-y-1.5 text-[11px]">
-                <p>(11) 97400-4406</p>
-                <p>WhatsApp disponível</p>
-                <p>Seg. a Sex. 9h às 18h</p>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-primary-foreground/10 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-[10px]">© {new Date().getFullYear()} VeloxBR — Todos os direitos reservados</p>
+        <div className="container max-w-6xl py-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
+              <img src={logoCheckout} alt="VeloxBR" className="h-6 object-contain opacity-80" />
+              <div className="h-4 w-px bg-primary-foreground/15" />
+              <p className="text-[10px]">Velox Centro Automotivo LTDA • CNPJ: 64.809.798/0001-08</p>
+            </div>
+            <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <BadgeCheck className="w-3.5 h-3.5 text-success" />
                 <span className="text-[10px]">Loja Verificada</span>
@@ -971,7 +990,14 @@ const Checkout = () => {
                 <ShieldCheck className="w-3.5 h-3.5 text-success" />
                 <span className="text-[10px]">Site Seguro SSL</span>
               </div>
+              <div className="flex items-center gap-1.5">
+                <Headphones className="w-3.5 h-3.5" />
+                <span className="text-[10px]">(11) 97400-4406</span>
+              </div>
             </div>
+          </div>
+          <div className="text-center mt-4 pt-3 border-t border-primary-foreground/10">
+            <p className="text-[9px] text-primary-foreground/40">© {new Date().getFullYear()} VeloxBR — Todos os direitos reservados</p>
           </div>
         </div>
       </footer>
