@@ -318,6 +318,23 @@ const Checkout = () => {
                     fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
                   },
                 });
+                supabase.functions.invoke("tiktok-events", {
+                  body: {
+                    event: "CompletePayment",
+                    value: priceInCents / 100,
+                    currency: "BRL",
+                    email: email.trim(),
+                    phone: cleanPhone(phone),
+                    name: name.trim(),
+                    city: city.trim(),
+                    state: uf.toUpperCase(),
+                    zip: cep.replace(/\D/g, ""),
+                    client_user_agent: navigator.userAgent,
+                    ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
+                    ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
+                    page_url: window.location.href,
+                  },
+                });
                 toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
                 supabase.functions.invoke("notify-sale", {
                   body: {
@@ -353,6 +370,23 @@ const Checkout = () => {
             client_user_agent: navigator.userAgent,
             fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1],
             fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
+          },
+        });
+        supabase.functions.invoke("tiktok-events", {
+          body: {
+            event: "CompletePayment",
+            value: priceInCents / 100,
+            currency: "BRL",
+            email: email.trim(),
+            phone: cleanPhone(phone),
+            name: name.trim(),
+            city: city.trim(),
+            state: uf.toUpperCase(),
+            zip: cep.replace(/\D/g, ""),
+            client_user_agent: navigator.userAgent,
+            ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
+            ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
+            page_url: window.location.href,
           },
         });
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
