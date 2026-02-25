@@ -92,14 +92,14 @@ serve(async (req) => {
           priceInCents: priceInCents,
         },
       ],
-      trackingParameters: trackingParameters || {
-        src: null,
-        sck: null,
-        utm_source: null,
-        utm_campaign: null,
-        utm_medium: null,
-        utm_content: null,
-        utm_term: null,
+      trackingParameters: {
+        src: trackingParameters?.src || null,
+        sck: trackingParameters?.sck || null,
+        utm_source: trackingParameters?.utm_source || null,
+        utm_campaign: trackingParameters?.utm_campaign || null,
+        utm_medium: trackingParameters?.utm_medium || null,
+        utm_content: trackingParameters?.utm_content || null,
+        utm_term: trackingParameters?.utm_term || null,
       },
       commission: {
         totalPriceInCents: priceInCents,
