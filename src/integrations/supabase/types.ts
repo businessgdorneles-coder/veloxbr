@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      abandoned_carts: {
+        Row: {
+          address: string | null
+          amount_cents: number | null
+          brand: string | null
+          cep: string | null
+          city: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          ip_address: string | null
+          model: string | null
+          name: string | null
+          payment_method: string | null
+          payment_status: string
+          phone: string | null
+          product_title: string | null
+          selected_color: string | null
+          selected_kit: string | null
+          selected_texture: string | null
+          session_id: string
+          state: string | null
+          updated_at: string
+          user_agent: string | null
+          vehicle_type: string | null
+          year: string | null
+        }
+        Insert: {
+          address?: string | null
+          amount_cents?: number | null
+          brand?: string | null
+          cep?: string | null
+          city?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          model?: string | null
+          name?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          phone?: string | null
+          product_title?: string | null
+          selected_color?: string | null
+          selected_kit?: string | null
+          selected_texture?: string | null
+          session_id: string
+          state?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_type?: string | null
+          year?: string | null
+        }
+        Update: {
+          address?: string | null
+          amount_cents?: number | null
+          brand?: string | null
+          cep?: string | null
+          city?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_address?: string | null
+          model?: string | null
+          name?: string | null
+          payment_method?: string | null
+          payment_status?: string
+          phone?: string | null
+          product_title?: string | null
+          selected_color?: string | null
+          selected_kit?: string | null
+          selected_texture?: string | null
+          session_id?: string
+          state?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          vehicle_type?: string | null
+          year?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

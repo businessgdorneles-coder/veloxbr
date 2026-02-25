@@ -41,6 +41,37 @@ const Checkout = () => {
     selectedTexture?: string;
   } | null;
 
+  // Session ID for cart tracking
+  const [sessionId] = useState(() => {
+    const existing = sessionStorage.getItem("cart_session_id");
+    if (existing) return existing;
+    const id = crypto.randomUUID();
+    sessionStorage.setItem("cart_session_id", id);
+    return id;
+  });
+
+  const trackCart = (payload: Record<string, unknown>) => {
+    supabase.functions.invoke("track-cart", {
+      body: {
+        session_id: sessionId,
+        user_agent: navigator.userAgent,
+        brand: orderData?.brand,
+        model: orderData?.model,
+        year: orderData?.year,
+        vehicle_type: orderData?.vehicleType,
+        selected_color: orderData?.selectedColor,
+        selected_kit: orderData?.selectedKit,
+        selected_texture: orderData?.selectedTexture,
+        ...payload,
+      },
+    }).catch(() => {});
+  };
+
+  // Track cart start
+  useEffect(() => {
+    trackCart({ payment_status: "cart_started" });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load Beehive tokenization script
   useEffect(() => {
     if (!document.querySelector('script[src*="paybeehive"]')) {
@@ -188,7 +219,11 @@ const Checkout = () => {
 
   const handleFinalizePurchase = async () => {
     setIsProcessing(true);
-
+    trackCart({
+      payment_status: "payment_started",
+      payment_method: paymentMethod === "card" ? "credit_card" : "pix",
+      amount_cents: priceInCents,
+    });
     try {
       let cardHash: string | undefined;
 
@@ -280,6 +315,7 @@ const Checkout = () => {
         const transactionId = data?.id || data?.transactionId;
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
+        trackCart({ payment_status: "pix_generated" });
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -336,6 +372,7 @@ const Checkout = () => {
                   },
                 });
                 toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
+                trackCart({ payment_status: "paid" });
                 supabase.functions.invoke("notify-sale", {
                   body: {
                     customerName: name.trim(),
@@ -390,6 +427,7 @@ const Checkout = () => {
           },
         });
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
+        trackCart({ payment_status: "paid" });
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
@@ -402,6 +440,7 @@ const Checkout = () => {
         });
       } else if (data?.status === "refused") {
         toast({ title: "Pagamento recusado", description: data?.refusedReason?.description || "Tente outro cartão.", variant: "destructive" });
+        trackCart({ payment_status: "refused" });
       } else {
         setTransactionStatus(data?.status || "processing");
         toast({ title: "Pagamento em processamento", description: "Aguarde a confirmação." });
@@ -509,7 +548,18 @@ const Checkout = () => {
                     <input type="tel" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} placeholder="(11) 99999-9999" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={15} />
                   </div>
                   <button
-                    onClick={() => validateStep1() && setCurrentStep(2)}
+                    onClick={() => {
+                      if (validateStep1()) {
+                        setCurrentStep(2);
+                        trackCart({
+                          payment_status: "identity_filled",
+                          name: name.trim(),
+                          email: email.trim(),
+                          phone: cleanPhone(phone),
+                          cpf: cleanCpf(cpf),
+                        });
+                      }
+                    }}
                     className="w-full bg-success text-primary-foreground font-bold py-3.5 rounded-lg text-sm flex items-center justify-center gap-2 hover:brightness-110 transition-all"
                   >
                     Continuar <ChevronRight className="w-4 h-4" />
@@ -570,6 +620,15 @@ const Checkout = () => {
                     onClick={() => {
                       if (validateStep2()) {
                         setCurrentStep(3);
+                        trackCart({
+                          payment_status: "address_filled",
+                          cep: cleanCep(cep),
+                          city: city.trim(),
+                          state: uf.toUpperCase(),
+                          address: `${addressStreet.trim()}, ${addressNumber.trim()}`,
+                          amount_cents: priceInCents,
+                          product_title: kitLabel,
+                        });
                         window.ttq?.track('AddPaymentInfo', {
                           content_type: 'product',
                           value: priceInCents / 100,

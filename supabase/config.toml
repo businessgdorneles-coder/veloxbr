@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.meta-events]
 verify_jwt = false
+
+[functions.track-cart]
+verify_jwt = false
