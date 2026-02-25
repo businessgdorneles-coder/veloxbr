@@ -141,8 +141,9 @@ const Checkout = () => {
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
 
-  // Stable orderId for UTMify (same across waiting_payment → paid)
+  // Stable orderId and createdAt for UTMify (same across waiting_payment → paid)
   const [utmifyOrderId] = useState(() => `VELOX-${Date.now()}`);
+  const [utmifyCreatedAt] = useState(() => new Date().toISOString().replace("T", " ").slice(0, 19));
 
   // UTM parameters for UTMify tracking
   const utmParams = (() => {
@@ -159,26 +160,36 @@ const Checkout = () => {
   })();
 
   const sendUtmifyEvent = (status: string, approvedDate?: string) => {
-    supabase.functions.invoke("utmify-sale", {
-      body: {
-        orderId: utmifyOrderId,
-        paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
-        status,
-        customer: {
-          name: name.trim(),
-          email: email.trim(),
-          phone: cleanPhone(phone),
-          document: cleanCpf(cpf),
-        },
-        product: {
-          id: orderData?.selectedKit === "completo" ? "kit-completo" : "kit-interno",
-          name: kitLabel,
-        },
-        priceInCents,
-        approvedDate: approvedDate || null,
-        trackingParameters: utmParams,
+    const payload = {
+      orderId: utmifyOrderId,
+      paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
+      status,
+      createdAt: utmifyCreatedAt,
+      customer: {
+        name: name.trim(),
+        email: email.trim(),
+        phone: cleanPhone(phone),
+        document: cleanCpf(cpf),
       },
-    }).catch(() => {});
+      product: {
+        id: orderData?.selectedKit === "completo" ? "kit-completo" : "kit-interno",
+        name: kitLabel,
+      },
+      priceInCents,
+      approvedDate: approvedDate || null,
+      trackingParameters: utmParams,
+    };
+    // Use keepalive to prevent request cancellation on page close
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/utmify-sale`;
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch((err) => console.error("UTMify event failed:", err));
   };
 
   const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
