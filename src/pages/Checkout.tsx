@@ -481,6 +481,7 @@ const Checkout = () => {
         });
         toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
         trackCart({ payment_status: "paid" });
+        sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
         supabase.functions.invoke("notify-sale", {
           body: {
             customerName: name.trim(),
