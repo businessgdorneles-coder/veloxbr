@@ -141,6 +141,9 @@ const Checkout = () => {
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
 
+  // Stable orderId for UTMify (same across waiting_payment → paid)
+  const [utmifyOrderId] = useState(() => `VELOX-${Date.now()}`);
+
   // UTM parameters for UTMify tracking
   const utmParams = (() => {
     const params = new URLSearchParams(window.location.search);
@@ -156,10 +159,9 @@ const Checkout = () => {
   })();
 
   const sendUtmifyEvent = (status: string, approvedDate?: string) => {
-    const orderId = `VELOX-${Date.now()}`;
     supabase.functions.invoke("utmify-sale", {
       body: {
-        orderId,
+        orderId: utmifyOrderId,
         paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
         status,
         customer: {
