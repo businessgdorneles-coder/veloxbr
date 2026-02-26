@@ -101,7 +101,7 @@ const HeroSection = () => {
 
           {/* RIGHT: Product Info */}
           <div className="space-y-5">
-            <div>
+            <div className="text-center">
               <h1 className="font-display font-bold text-lg md:text-2xl xl:text-3xl text-foreground leading-tight uppercase inline break-words">
                 Tapete Bandeja 3D Premium 5 Peças Incluso Porta Malas
               </h1>
