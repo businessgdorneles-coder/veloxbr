@@ -168,11 +168,11 @@ const HeroSection = () => {
               </div>
 
               {/* Custom vehicle toggle */}
-              <div className="mt-4 pt-3 border-t border-border">
+              <div className="mt-4 pt-3 border-t border-border text-center">
                 <button
                   type="button"
                   onClick={() => setCustomVehicle(!customVehicle)}
-                  className="text-xs text-success font-semibold underline underline-offset-2 hover:brightness-110 transition-all"
+                  className="text-xs text-warning font-semibold underline underline-offset-2 hover:brightness-110 transition-all"
                 >
                   Não encontrou seu veículo? Clique aqui
                 </button>
