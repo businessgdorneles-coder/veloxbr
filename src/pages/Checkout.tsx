@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones, Award } from "lucide-react";
+import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones, Award, Clock, Smartphone, QrCode, CircleDollarSign, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
@@ -137,9 +137,36 @@ const Checkout = () => {
   // PIX result
   const [pixData, setPixData] = useState<{ qrcode: string; url: string; transactionId?: string } | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
+  const [pixCountdown, setPixCountdown] = useState(900);
 
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
+
+  // PIX countdown timer
+  const pixTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => {
+    if (pixData && transactionStatus !== "paid") {
+      setPixCountdown(900);
+      pixTimerRef.current = setInterval(() => {
+        setPixCountdown((prev) => {
+          if (prev <= 1) {
+            if (pixTimerRef.current) clearInterval(pixTimerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (pixTimerRef.current) clearInterval(pixTimerRef.current);
+    };
+  }, [pixData, transactionStatus]);
+
+  const formatCountdown = useCallback((seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }, []);
 
   // Stable orderId and createdAt for UTMify (same across waiting_payment → paid)
   const [utmifyOrderId] = useState(() => `VELOX-${Date.now()}`);
@@ -761,9 +788,29 @@ const Checkout = () => {
                   {/* PIX QR Code result */}
                   {pixData ? (
                     <div className="space-y-4">
+                      {/* Urgency countdown timer */}
+                      <div className={`flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-bold ${pixCountdown <= 120 ? "bg-destructive/10 text-destructive border border-destructive/30" : "bg-warning/10 text-warning border border-warning/30"}`}>
+                        {pixCountdown <= 120 ? <AlertTriangle className="w-4 h-4 animate-pulse" /> : <Clock className="w-4 h-4" />}
+                        {pixCountdown > 0
+                          ? <>PIX expira em <span className="font-mono text-base">{formatCountdown(pixCountdown)}</span></>
+                          : "PIX expirado — gere um novo"}
+                      </div>
+
+                      {/* Waiting payment status */}
+                      {transactionStatus === "waiting_payment" && (
+                        <div className="flex items-center justify-center gap-2 p-2.5 bg-primary/5 border border-primary/20 rounded-lg">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: "300ms" }} />
+                          </div>
+                          <span className="text-sm font-semibold text-primary">Aguardando pagamento...</span>
+                        </div>
+                      )}
+
                       <div className="p-4 bg-muted/50 rounded-lg text-center">
                         <p className="font-bold text-sm mb-3">Escaneie o QR Code ou copie o código PIX</p>
-                        <div className="bg-background p-4 rounded-lg inline-block mb-3">
+                        <div className="bg-background p-4 rounded-lg inline-block mb-3 ring-2 ring-primary/20 animate-pulse" style={{ animationDuration: "3s" }}>
                           <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pixData.qrcode)}`} alt="QR Code PIX" className="w-48 h-48" />
                         </div>
                         <div className="flex gap-2 max-w-sm mx-auto">
@@ -773,7 +820,40 @@ const Checkout = () => {
                             {pixCopied ? "Copiado" : "Copiar"}
                           </button>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-3">Após o pagamento, a confirmação é automática.</p>
+                      </div>
+
+                      {/* Step-by-step PIX instructions */}
+                      <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                        <p className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-3">Como pagar com PIX</p>
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">1</div>
+                            <div>
+                              <p className="text-sm font-semibold">Copie o código ou escaneie o QR Code</p>
+                              <p className="text-xs text-muted-foreground">Toque em "Copiar" acima</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">2</div>
+                            <div>
+                              <p className="text-sm font-semibold">Abra o app do seu banco</p>
+                              <p className="text-xs text-muted-foreground">Vá na opção PIX → Pagar com código</p>
+                            </div>
+                          </div>
+                          <div className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shrink-0">3</div>
+                            <div>
+                              <p className="text-sm font-semibold">Cole o código e confirme</p>
+                              <p className="text-xs text-muted-foreground">A confirmação aqui é automática ✅</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Savings reminder */}
+                      <div className="flex items-center justify-center gap-2 p-3 bg-success/10 border border-success/30 rounded-lg">
+                        <CircleDollarSign className="w-5 h-5 text-success" />
+                        <p className="text-sm font-bold text-success">Você está economizando R$ {discountFormatted} com PIX!</p>
                       </div>
                     </div>
                   ) : (
@@ -795,11 +875,26 @@ const Checkout = () => {
                       </div>
 
                       {paymentMethod === "pix" ? (
-                        <div className="p-4 bg-success/10 border border-success/30 rounded-lg text-center">
-                          <p className="text-sm font-bold text-success mb-1">🎉 Você economiza R$ {discountFormatted} pagando no PIX!</p>
-                          <p className="text-sm text-muted-foreground mb-1">Total com desconto: <strong>R$ {priceFormatted}</strong></p>
-                          <p className="text-xs text-muted-foreground">Ao confirmar, um QR Code PIX será gerado para pagamento.</p>
-                          <p className="text-xs text-muted-foreground">Pagamento instantâneo • Aprovação imediata</p>
+                        <div className="p-4 bg-success/10 border border-success/30 rounded-lg">
+                          <div className="text-center mb-3">
+                            <p className="text-base font-bold text-success mb-0.5">🎉 Você economiza R$ {discountFormatted} pagando no PIX!</p>
+                            <p className="text-sm text-muted-foreground">Total com desconto: <strong className="text-foreground text-lg">R$ {priceFormatted}</strong></p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 mb-3">
+                            <div className="flex flex-col items-center gap-1 p-2 bg-background/60 rounded-lg">
+                              <QrCode className="w-4 h-4 text-success" />
+                              <span className="text-[10px] font-semibold text-center leading-tight">QR Code instantâneo</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 p-2 bg-background/60 rounded-lg">
+                              <Smartphone className="w-4 h-4 text-success" />
+                              <span className="text-[10px] font-semibold text-center leading-tight">Pague pelo celular</span>
+                            </div>
+                            <div className="flex flex-col items-center gap-1 p-2 bg-background/60 rounded-lg">
+                              <Check className="w-4 h-4 text-success" />
+                              <span className="text-[10px] font-semibold text-center leading-tight">Aprovação imediata</span>
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground text-center">⚡ Ao confirmar, um QR Code PIX será gerado para pagamento.</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
