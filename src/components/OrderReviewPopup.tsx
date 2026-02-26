@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import {
@@ -8,15 +7,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import prod1 from "@/assets/prod1.webp";
-import prod2 from "@/assets/prod2.jpg";
-import prod3 from "@/assets/prod3.jpg";
-
-const textures = [
-  { name: "Textura A", image: prod1 },
-  { name: "Textura B", image: prod2 },
-  { name: "Textura C", image: prod3 },
-];
 
 interface OrderReviewPopupProps {
   open: boolean;
@@ -40,7 +30,7 @@ const OrderReviewPopup = ({
   selectedKit,
 }: OrderReviewPopupProps) => {
   const navigate = useNavigate();
-  const [selectedTexture, setSelectedTexture] = useState("");
+  
 
   const summaryRows = [
     { label: "Marca", value: brand },
@@ -49,7 +39,7 @@ const OrderReviewPopup = ({
     { label: "Tipo", value: vehicleType ? (vehicleType === "carro" ? "Carro" : "Caminhão") : "" },
     { label: "Cor", value: selectedColor !== "Preto" && selectedColor !== "Cinza" && selectedColor !== "Bege" ? "" : selectedColor },
     { label: "Kit", value: selectedKit === "completo" ? "Com porta-malas" : "Sem porta-malas" },
-    { label: "Textura", value: selectedTexture },
+    
   ];
 
   return (
@@ -64,36 +54,6 @@ const OrderReviewPopup = ({
           </DialogHeader>
         </div>
 
-        {/* Texture Selection */}
-        <div className="mx-6 mb-4 p-4 rounded-xl border border-border bg-muted/30">
-          <h4 className="font-bold text-sm mb-1">Escolha a textura do seu carpete</h4>
-          <p className="text-xs text-muted-foreground mb-4">
-            Isso ajuda a garantir que você receba exatamente o acabamento que viu no anúncio.
-          </p>
-          <div className="grid grid-cols-3 gap-3">
-            {textures.map((t) => (
-              <div
-                key={t.name}
-                className={`rounded-xl border-2 p-2 text-center transition-all ${
-                  selectedTexture === t.name
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-background"
-                }`}
-              >
-                <div className="aspect-square rounded-lg overflow-hidden mb-2 bg-muted">
-                  <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
-                </div>
-                <p className="text-xs font-bold mb-2">{t.name}</p>
-                <button
-                  onClick={() => setSelectedTexture(t.name)}
-                  className="w-full bg-primary text-primary-foreground text-xs font-bold py-1.5 rounded-lg hover:brightness-110 transition-all"
-                >
-                  Ver
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Summary Table */}
         <div className="mx-6 mb-4 p-4 rounded-xl border border-border bg-muted/30">
@@ -136,7 +96,7 @@ const OrderReviewPopup = ({
                   vehicleType,
                   selectedColor,
                   selectedKit,
-                  selectedTexture,
+                  
                 },
               });
             }}
