@@ -109,6 +109,8 @@ serve(async (req) => {
       },
     };
 
+    console.log("📤 Sending to UTMify API:", JSON.stringify(utmifyPayload));
+
     const response = await fetch("https://api.utmify.com.br/api-credentials/orders", {
       method: "POST",
       headers: {
@@ -118,15 +120,27 @@ serve(async (req) => {
       body: JSON.stringify(utmifyPayload),
     });
 
-    const data = await response.json().catch(() => ({}));
+    const responseText = await response.text();
+    let data: Record<string, unknown> = {};
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      console.error("UTMify returned non-JSON:", responseText.substring(0, 500));
+      return new Response(
+        JSON.stringify({ error: "UTMify returned non-JSON response", raw: responseText.substring(0, 200) }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     if (!response.ok) {
-      console.error("UTMify API error:", JSON.stringify(data));
+      console.error("UTMify API error:", response.status, JSON.stringify(data));
       return new Response(
-        JSON.stringify({ error: "UTMify request failed", details: data }),
+        JSON.stringify({ error: "UTMify request failed", status: response.status, details: data }),
         { status: response.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("✅ UTMify API success:", JSON.stringify(data));
 
     return new Response(JSON.stringify({ success: true, data }), {
       status: 200,
