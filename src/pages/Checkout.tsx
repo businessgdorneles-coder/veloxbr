@@ -159,6 +159,27 @@ const Checkout = () => {
     };
   })();
 
+  const invokeWithKeepalive = (functionName: string, body: Record<string, unknown>) => {
+    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`;
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        console.log(`✅ ${functionName} OK`, data);
+      } else {
+        console.error(`❌ ${functionName} HTTP ${res.status}`, data);
+      }
+      return data;
+    }).catch((err) => console.error(`❌ ${functionName} network error:`, err));
+  };
+
   const sendUtmifyEvent = (status: string, approvedDate?: string) => {
     const payload = {
       orderId: utmifyOrderId,
@@ -179,24 +200,18 @@ const Checkout = () => {
       approvedDate: approvedDate || null,
       trackingParameters: utmParams,
     };
-    // Use keepalive to prevent request cancellation on page close
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/utmify-sale`;
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    }).then(async (res) => {
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        console.log(`✅ UTMify [${status}] orderId=${payload.orderId}`, data);
-      } else {
-        console.error(`❌ UTMify [${status}] orderId=${payload.orderId} HTTP ${res.status}`, data);
-      }
-    }).catch((err) => console.error("❌ UTMify network error:", err));
+    invokeWithKeepalive("utmify-sale", payload);
+  };
+
+  const sendNotifySale = (notificationType: string) => {
+    invokeWithKeepalive("notify-sale", {
+      customerName: name.trim(),
+      amount: priceInCents,
+      paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
+      product: kitLabel,
+      city: city.trim(),
+      notificationType,
+    });
   };
 
   const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
@@ -393,16 +408,7 @@ const Checkout = () => {
         setTransactionStatus("waiting_payment");
         trackCart({ payment_status: "pix_generated" });
         sendUtmifyEvent("waiting_payment");
-        supabase.functions.invoke("notify-sale", {
-          body: {
-            customerName: name.trim(),
-            amount: priceInCents,
-            paymentMethod: "pix",
-            product: kitLabel,
-            city: city.trim(),
-            notificationType: "pix_generated",
-          },
-        });
+        sendNotifySale("pix_generated");
 
         if (transactionId) {
           pixPollingRef.current = setInterval(async () => {
@@ -410,117 +416,97 @@ const Checkout = () => {
               const { data: statusData } = await supabase.functions.invoke("create-transaction", {
                 body: { checkStatus: true, transactionId },
               });
+              console.log("🔄 PIX polling status:", statusData?.status, statusData);
               if (statusData?.status === "paid" || statusData?.status === "authorized") {
-        if (pixPollingRef.current) clearInterval(pixPollingRef.current);
-                setTransactionStatus("paid");
+                if (pixPollingRef.current) {
+                  clearInterval(pixPollingRef.current);
+                  pixPollingRef.current = null;
+                }
+                // Fire all notifications BEFORE setTransactionStatus to avoid unmount cancellation
                 try {
                   window.ttq?.track('CompletePayment', { content_type: 'product', value: priceInCents / 100, currency: 'BRL' });
                   window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
-                  supabase.functions.invoke("meta-events", {
-                    body: {
-                      event_name: "Purchase",
-                      value: priceInCents / 100,
-                      currency: "BRL",
-                      email: email.trim(),
-                      phone: phone.trim(),
-                      name: name.trim(),
-                      city: city.trim(),
-                      state: uf.toUpperCase(),
-                      zip: cep.replace(/\D/g, ""),
-                      client_user_agent: navigator.userAgent,
-                      fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1],
-                      fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
-                    },
-                  }).catch(() => {});
-                  supabase.functions.invoke("tiktok-events", {
-                    body: {
-                      event: "CompletePayment",
-                      value: priceInCents / 100,
-                      currency: "BRL",
-                      email: email.trim(),
-                      phone: cleanPhone(phone),
-                      name: name.trim(),
-                      city: city.trim(),
-                      state: uf.toUpperCase(),
-                      zip: cep.replace(/\D/g, ""),
-                      client_user_agent: navigator.userAgent,
-                      ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
-                      ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
-                      page_url: window.location.href,
-                    },
-                  }).catch(() => {});
-                  toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
-         trackCart({ payment_status: "paid" });
-         sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
-                  supabase.functions.invoke("notify-sale", {
-                    body: {
-                      customerName: name.trim(),
-                      amount: priceInCents,
-                      paymentMethod: "pix",
-                      product: kitLabel,
-                      city: city.trim(),
-                      notificationType: "pix_paid",
-                    },
-                  }).catch(() => {});
-                } catch {
-                  // ignore tracking errors after payment confirmed
-                }
+                } catch {}
+                trackCart({ payment_status: "paid" });
+                sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
+                sendNotifySale("pix_paid");
+                invokeWithKeepalive("meta-events", {
+                  event_name: "Purchase",
+                  value: priceInCents / 100,
+                  currency: "BRL",
+                  email: email.trim(),
+                  phone: phone.trim(),
+                  name: name.trim(),
+                  city: city.trim(),
+                  state: uf.toUpperCase(),
+                  zip: cep.replace(/\D/g, ""),
+                  client_user_agent: navigator.userAgent,
+                  fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1],
+                  fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
+                });
+                invokeWithKeepalive("tiktok-events", {
+                  event: "CompletePayment",
+                  value: priceInCents / 100,
+                  currency: "BRL",
+                  email: email.trim(),
+                  phone: cleanPhone(phone),
+                  name: name.trim(),
+                  city: city.trim(),
+                  state: uf.toUpperCase(),
+                  zip: cep.replace(/\D/g, ""),
+                  client_user_agent: navigator.userAgent,
+                  ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
+                  ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
+                  page_url: window.location.href,
+                });
+                toast({ title: "PIX confirmado! ✅", description: "Seu pagamento foi aprovado." });
+                // Set state LAST to avoid premature re-render/unmount
+                setTransactionStatus("paid");
               }
-            } catch {
-              // ignore polling errors
+            } catch (pollErr) {
+              console.error("❌ PIX polling error:", pollErr);
             }
           }, 5000);
         }
       } else if (data?.status === "paid" || data?.status === "authorized") {
-        setTransactionStatus("paid");
-        window.ttq?.track('CompletePayment', { content_type: 'product', value: priceInCents / 100, currency: 'BRL' });
-        window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
-        supabase.functions.invoke("meta-events", {
-          body: {
-            event_name: "Purchase",
-            value: priceInCents / 100,
-            currency: "BRL",
-            email: email.trim(),
-            phone: phone.trim(),
-            name: name.trim(),
-            city: city.trim(),
-            state: uf.toUpperCase(),
-            zip: cep.replace(/\D/g, ""),
-            client_user_agent: navigator.userAgent,
-            fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1],
-            fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
-          },
-        });
-        supabase.functions.invoke("tiktok-events", {
-          body: {
-            event: "CompletePayment",
-            value: priceInCents / 100,
-            currency: "BRL",
-            email: email.trim(),
-            phone: cleanPhone(phone),
-            name: name.trim(),
-            city: city.trim(),
-            state: uf.toUpperCase(),
-            zip: cep.replace(/\D/g, ""),
-            client_user_agent: navigator.userAgent,
-            ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
-            ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
-            page_url: window.location.href,
-          },
-        });
-        toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
+        try {
+          window.ttq?.track('CompletePayment', { content_type: 'product', value: priceInCents / 100, currency: 'BRL' });
+          window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
+        } catch {}
         trackCart({ payment_status: "paid" });
         sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
-        supabase.functions.invoke("notify-sale", {
-          body: {
-            customerName: name.trim(),
-            amount: priceInCents,
-            paymentMethod: "card",
-            product: kitLabel,
-            city: city.trim(),
-            notificationType: "card_paid",
-          },
+        sendNotifySale("card_paid");
+        invokeWithKeepalive("meta-events", {
+          event_name: "Purchase",
+          value: priceInCents / 100,
+          currency: "BRL",
+          email: email.trim(),
+          phone: phone.trim(),
+          name: name.trim(),
+          city: city.trim(),
+          state: uf.toUpperCase(),
+          zip: cep.replace(/\D/g, ""),
+          client_user_agent: navigator.userAgent,
+          fbp: document.cookie.match(/_fbp=([^;]+)/)?.[1],
+          fbc: document.cookie.match(/_fbc=([^;]+)/)?.[1],
         });
+        invokeWithKeepalive("tiktok-events", {
+          event: "CompletePayment",
+          value: priceInCents / 100,
+          currency: "BRL",
+          email: email.trim(),
+          phone: cleanPhone(phone),
+          name: name.trim(),
+          city: city.trim(),
+          state: uf.toUpperCase(),
+          zip: cep.replace(/\D/g, ""),
+          client_user_agent: navigator.userAgent,
+          ttp: document.cookie.match(/_ttp=([^;]+)/)?.[1],
+          ttclid: new URLSearchParams(window.location.search).get("ttclid") || undefined,
+          page_url: window.location.href,
+        });
+        toast({ title: "Pagamento aprovado! ✅", description: "Seu pedido foi confirmado." });
+        setTransactionStatus("paid");
       } else if (data?.status === "refused") {
         toast({ title: "Pagamento recusado", description: data?.refusedReason?.description || "Tente outro cartão.", variant: "destructive" });
         trackCart({ payment_status: "refused" });
