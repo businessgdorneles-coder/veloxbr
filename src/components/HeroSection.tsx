@@ -121,6 +121,19 @@ const HeroSection = () => {
               </div>
             </div>
 
+            {/* Price block */}
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <p className="text-muted-foreground text-sm line-through">R$ {oldPrice}</p>
+                <span className="bg-success text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">{discount}% Off</span>
+              </div>
+              <p className="font-display font-black text-4xl md:text-5xl text-success leading-none mb-1">
+                R$ {price}
+              </p>
+              <p className="text-muted-foreground text-xs mb-2">até 3x de <strong>R$ {installment}</strong></p>
+              <p className="text-success text-xs font-bold">Economia de {savings}</p>
+            </div>
+
             {/* Vehicle Selector - Sequential Steps */}
             <div className="bg-card border border-border rounded-2xl p-5">
               <h3 className="font-display font-bold text-base text-foreground text-center mb-1">Selecione seu Veículo</h3>
@@ -198,19 +211,6 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Price block */}
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <p className="text-muted-foreground text-sm line-through">R$ {oldPrice}</p>
-                <span className="bg-success text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">{discount}% Off</span>
-              </div>
-              <p className="font-display font-black text-4xl md:text-5xl text-success leading-none mb-1">
-                R$ {price}
-              </p>
-              <p className="text-muted-foreground text-xs mb-2">até 3x de <strong>R$ {installment}</strong></p>
-              <p className="text-success text-xs font-bold">Economia de {savings}</p>
             </div>
 
             {/* Kit selector */}
