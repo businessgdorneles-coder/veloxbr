@@ -14,7 +14,7 @@ const LazySection = ({ children }: { children: React.ReactNode }) => (
 const Index = () => {
 
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden border border-border">
       <MarqueeBar />
       <Header />
       <main>
