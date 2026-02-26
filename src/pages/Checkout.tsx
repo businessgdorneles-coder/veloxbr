@@ -145,17 +145,21 @@ const Checkout = () => {
   const [utmifyOrderId] = useState(() => `VELOX-${Date.now()}`);
   const [utmifyCreatedAt] = useState(() => new Date().toISOString().replace("T", " ").slice(0, 19));
 
-  // UTM parameters for UTMify tracking
+  // UTM parameters - read from sessionStorage (persisted from landing page URL)
   const utmParams = (() => {
+    // First try sessionStorage (saved by landing page)
+    const stored = sessionStorage.getItem("utm_params");
+    const fromStorage = stored ? JSON.parse(stored) : {};
+    // Also check current URL as fallback (direct checkout link)
     const params = new URLSearchParams(window.location.search);
     return {
-      src: params.get("src"),
-      sck: params.get("sck"),
-      utm_source: params.get("utm_source"),
-      utm_campaign: params.get("utm_campaign"),
-      utm_medium: params.get("utm_medium"),
-      utm_content: params.get("utm_content"),
-      utm_term: params.get("utm_term"),
+      src: fromStorage.src || params.get("src") || null,
+      sck: fromStorage.sck || params.get("sck") || null,
+      utm_source: fromStorage.utm_source || params.get("utm_source") || null,
+      utm_campaign: fromStorage.utm_campaign || params.get("utm_campaign") || null,
+      utm_medium: fromStorage.utm_medium || params.get("utm_medium") || null,
+      utm_content: fromStorage.utm_content || params.get("utm_content") || null,
+      utm_term: fromStorage.utm_term || params.get("utm_term") || null,
     };
   })();
 
