@@ -448,7 +448,7 @@ const Checkout = () => {
         const transactionId = data?.id || data?.transactionId;
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
-        trackCart({ payment_status: "pix_generated" });
+        trackCart({ payment_status: "pix_generated", transaction_id: transactionId, utmify_order_id: utmifyOrderId });
         // Auto-scroll to PIX section after state update
         setTimeout(() => {
           pixSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
