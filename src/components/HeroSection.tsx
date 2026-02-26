@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Check, ChevronLeft, ChevronRight, BadgeCheck, Star } from "lucide-react";
 import { vehicleData } from "@/data/vehicleData";
 import OrderReviewPopup from "@/components/OrderReviewPopup";
@@ -25,6 +25,10 @@ const HeroSection = () => {
   const [brand, setBrand] = useState<string>("");
   const [model, setModel] = useState<string>("");
   const [year, setYear] = useState<string>("");
+
+  const [customVehicle, setCustomVehicle] = useState(false);
+  const [customModel, setCustomModel] = useState("");
+  const [customYear, setCustomYear] = useState("");
 
   // Default to "carro" since reference doesn't show type selector
   const vehicleType = "carro";
@@ -162,6 +166,38 @@ const HeroSection = () => {
                   </div>
                 )}
               </div>
+
+              {/* Custom vehicle toggle */}
+              <div className="mt-4 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setCustomVehicle(!customVehicle)}
+                  className="text-xs text-success font-semibold underline underline-offset-2 hover:brightness-110 transition-all"
+                >
+                  Não encontrou seu veículo? Clique aqui
+                </button>
+                {customVehicle && (
+                  <div className="mt-3 space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Ex: Fiat Pulse Drive 2024"
+                      value={customModel}
+                      onChange={(e) => setCustomModel(e.target.value)}
+                      maxLength={100}
+                      className="w-full border border-border rounded-xl px-3 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-success/30"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Ano do veículo"
+                      value={customYear}
+                      onChange={(e) => setCustomYear(e.target.value)}
+                      maxLength={10}
+                      className="w-full border border-border rounded-xl px-3 py-2.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-success/30"
+                    />
+                    <p className="text-[10px] text-muted-foreground text-center">Fabricamos sob medida para qualquer veículo</p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Price block */}
@@ -243,13 +279,18 @@ const HeroSection = () => {
             </div>
 
             {/* CTA */}
-            <button
-              onClick={() => setShowReview(true)}
-              className={`w-full font-bold py-4 rounded-xl text-base transition-all ${year ? "bg-primary text-primary-foreground hover:brightness-110 shadow-blue-lg animate-pulse-glow" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
-              disabled={!year}
-            >
-              {year ? "CONFIRMAR MINHA ENCOMENDA →" : "SELECIONE SEU VEÍCULO ACIMA"}
-            </button>
+            {(() => {
+              const canProceed = year || (customVehicle && customModel.trim() && customYear.trim());
+              return (
+                <button
+                  onClick={() => setShowReview(true)}
+                  className={`w-full font-bold py-4 rounded-xl text-base transition-all ${canProceed ? "bg-primary text-primary-foreground hover:brightness-110 shadow-blue-lg animate-pulse-glow" : "bg-muted text-muted-foreground cursor-not-allowed"}`}
+                  disabled={!canProceed}
+                >
+                  {canProceed ? "CONFIRMAR MINHA ENCOMENDA →" : "SELECIONE SEU VEÍCULO ACIMA"}
+                </button>
+              );
+            })()}
 
             {/* WhatsApp */}
             <a
@@ -269,9 +310,9 @@ const HeroSection = () => {
         open={showReview}
         onOpenChange={setShowReview}
         vehicleType={vehicleType}
-        brand={brand}
-        model={model}
-        year={year}
+        brand={customVehicle ? customModel.trim() : brand}
+        model={customVehicle ? customModel.trim() : model}
+        year={customVehicle ? customYear.trim() : year}
         selectedColor="Preto"
         selectedKit={selectedKit}
       />
