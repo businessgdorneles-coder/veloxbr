@@ -138,6 +138,7 @@ const Checkout = () => {
   const [pixData, setPixData] = useState<{ qrcode: string; url: string; transactionId?: string } | null>(null);
   const [pixCopied, setPixCopied] = useState(false);
   const [pixCountdown, setPixCountdown] = useState(900);
+  const pixSectionRef = useRef<HTMLDivElement>(null);
 
   // Transaction result
   const [transactionStatus, setTransactionStatus] = useState<string | null>(null);
@@ -438,6 +439,10 @@ const Checkout = () => {
         setPixData({ qrcode: data.pix.qrcode, url: data.pix.url, transactionId });
         setTransactionStatus("waiting_payment");
         trackCart({ payment_status: "pix_generated" });
+        // Auto-scroll to PIX section after state update
+        setTimeout(() => {
+          pixSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
         sendUtmifyEvent("waiting_payment");
         sendNotifySale("pix_generated");
 
@@ -587,7 +592,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+    <div className="min-h-screen bg-muted/30 flex flex-col overflow-x-hidden" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
       {/* Header */}
       <header className="bg-primary py-3">
         <div className="container flex items-center justify-between max-w-6xl">
@@ -643,12 +648,12 @@ const Checkout = () => {
       </div>
 
       {/* Main layout */}
-      <div className="container max-w-6xl pb-8 pt-6 flex-1">
-        <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+      <div className="px-3 sm:px-4 md:container max-w-6xl pb-8 pt-4 sm:pt-6 flex-1 mx-auto w-full">
+        <div className="grid lg:grid-cols-[1fr_380px] gap-4 sm:gap-8">
           {/* Left - Form Steps */}
           <div className="space-y-4">
             {/* Step 1 */}
-            <div className={`bg-background rounded-xl border border-border p-6 ${currentStep !== 1 && "opacity-60"}`}>
+            <div id="step-1" className={`bg-background rounded-xl border border-border p-4 sm:p-6 ${currentStep !== 1 && "opacity-60"}`}>
               <div className="flex items-center gap-3 mb-1">
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${currentStep >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>1</span>
                 <h2 className="font-display font-bold text-lg">Identifique-se</h2>
@@ -676,6 +681,7 @@ const Checkout = () => {
                     onClick={() => {
                       if (validateStep1()) {
                         setCurrentStep(2);
+                        setTimeout(() => document.getElementById("step-2")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
                         trackCart({
                           payment_status: "identity_filled",
                           name: name.trim(),
@@ -699,7 +705,7 @@ const Checkout = () => {
             </div>
 
             {/* Step 2 */}
-            <div className={`bg-background rounded-xl border border-border p-6 ${currentStep !== 2 && "opacity-60"}`}>
+            <div id="step-2" className={`bg-background rounded-xl border border-border p-4 sm:p-6 ${currentStep !== 2 && "opacity-60"}`}>
               <div className="flex items-center gap-3 mb-1">
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${currentStep >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>2</span>
                 <h2 className="font-display font-bold text-lg">Entrega</h2>
@@ -745,6 +751,7 @@ const Checkout = () => {
                     onClick={() => {
                       if (validateStep2()) {
                         setCurrentStep(3);
+                        setTimeout(() => document.getElementById("step-3")?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
                         trackCart({
                           payment_status: "address_filled",
                           cep: cleanCep(cep),
@@ -778,7 +785,7 @@ const Checkout = () => {
             </div>
 
             {/* Step 3 */}
-            <div className={`bg-background rounded-xl border border-border p-6 ${currentStep !== 3 && "opacity-60"}`}>
+            <div id="step-3" className={`bg-background rounded-xl border border-border p-4 sm:p-6 ${currentStep !== 3 && "opacity-60"}`}>
               <div className="flex items-center gap-3 mb-1">
                 <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold ${currentStep >= 3 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>3</span>
                 <h2 className="font-display font-bold text-lg">Pagamento</h2>
@@ -787,7 +794,7 @@ const Checkout = () => {
                 <div className="mt-4 space-y-4">
                   {/* PIX QR Code result */}
                   {pixData ? (
-                    <div className="space-y-4">
+                    <div ref={pixSectionRef} className="space-y-4">
                       {/* Urgency countdown timer */}
                       <div className={`flex items-center justify-center gap-2 p-3 rounded-lg text-sm font-bold ${pixCountdown <= 120 ? "bg-destructive/10 text-destructive border border-destructive/30" : "bg-warning/10 text-warning border border-warning/30"}`}>
                         {pixCountdown <= 120 ? <AlertTriangle className="w-4 h-4 animate-pulse" /> : <Clock className="w-4 h-4" />}
@@ -810,7 +817,7 @@ const Checkout = () => {
 
                       <div className="p-4 bg-muted/50 rounded-lg text-center">
                         <p className="font-bold text-sm mb-3">Escaneie o QR Code ou copie o código PIX</p>
-                        <div className="bg-background p-4 rounded-lg inline-block mb-3 ring-2 ring-primary/20 animate-pulse" style={{ animationDuration: "3s" }}>
+                        <div className="bg-background p-4 rounded-lg inline-block mb-3 ring-2 ring-primary/20">
                           <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pixData.qrcode)}`} alt="QR Code PIX" className="w-48 h-48" />
                         </div>
                         <div className="flex gap-2 max-w-sm mx-auto">

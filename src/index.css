@@ -96,7 +96,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-size: 20px;
-    padding: 10px;
+    padding: 0;
   }
 }
 
