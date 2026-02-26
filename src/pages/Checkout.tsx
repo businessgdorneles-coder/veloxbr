@@ -191,6 +191,24 @@ const Checkout = () => {
     };
   })();
 
+  const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
+  const PIX_DISCOUNT = 0.05;
+  const priceInCents = paymentMethod === "pix"
+    ? Math.round(basePriceInCents * (1 - PIX_DISCOUNT))
+    : basePriceInCents;
+  const priceFormatted = (priceInCents / 100).toFixed(2).replace(".", ",");
+  const basePriceFormatted = (basePriceInCents / 100).toFixed(2).replace(".", ",");
+  const discountInCents = basePriceInCents - Math.round(basePriceInCents * (1 - PIX_DISCOUNT));
+  const discountFormatted = (discountInCents / 100).toFixed(2).replace(".", ",");
+  const kitLabel = orderData?.selectedKit === "completo"
+    ? "Kit Tapetes Internos Bandeja + Porta-Malas"
+    : "Kit Tapetes Internos Bandeja";
+  const colorLabel = orderData?.selectedColor || "Preto";
+
+  const cleanPhone = (p: string) => p.replace(/\D/g, "");
+  const cleanCpf = (c: string) => c.replace(/\D/g, "");
+  const cleanCep = (c: string) => c.replace(/\D/g, "");
+
   const invokeWithKeepalive = (functionName: string, body: Record<string, unknown>) => {
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`;
     return fetch(url, {
@@ -212,7 +230,7 @@ const Checkout = () => {
     }).catch((err) => console.error(`❌ ${functionName} network error:`, err));
   };
 
-  const sendUtmifyEvent = (status: string, approvedDate?: string) => {
+  const sendUtmifyEvent = useCallback((status: string, approvedDate?: string) => {
     const payload = {
       orderId: utmifyOrderId,
       paymentMethod: paymentMethod === "card" ? "credit_card" : "pix",
@@ -232,8 +250,15 @@ const Checkout = () => {
       approvedDate: approvedDate || null,
       trackingParameters: utmParams,
     };
-    invokeWithKeepalive("utmify-sale", payload);
-  };
+    console.log("📤 UTMify event:", status, JSON.stringify(payload));
+    return invokeWithKeepalive("utmify-sale", payload);
+  }, [utmifyOrderId, utmifyCreatedAt, paymentMethod, name, email, phone, cpf, orderData, kitLabel, priceInCents, utmParams]);
+
+  // Ref to always have the latest sendUtmifyEvent in polling callbacks
+  const sendUtmifyEventRef = useRef(sendUtmifyEvent);
+  useEffect(() => {
+    sendUtmifyEventRef.current = sendUtmifyEvent;
+  }, [sendUtmifyEvent]);
 
   const sendNotifySale = (notificationType: string) => {
     invokeWithKeepalive("notify-sale", {
@@ -246,23 +271,8 @@ const Checkout = () => {
     });
   };
 
-  const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
-  const PIX_DISCOUNT = 0.05;
-  const priceInCents = paymentMethod === "pix"
-    ? Math.round(basePriceInCents * (1 - PIX_DISCOUNT))
-    : basePriceInCents;
-  const priceFormatted = (priceInCents / 100).toFixed(2).replace(".", ",");
-  const basePriceFormatted = (basePriceInCents / 100).toFixed(2).replace(".", ",");
-  const discountInCents = basePriceInCents - Math.round(basePriceInCents * (1 - PIX_DISCOUNT));
-  const discountFormatted = (discountInCents / 100).toFixed(2).replace(".", ",");
-  const kitLabel = orderData?.selectedKit === "completo"
-    ? "Kit Tapetes Internos Bandeja + Porta-Malas"
-    : "Kit Tapetes Internos Bandeja";
-  const colorLabel = orderData?.selectedColor || "Preto";
 
-  const cleanPhone = (p: string) => p.replace(/\D/g, "");
-  const cleanCpf = (c: string) => c.replace(/\D/g, "");
-  const cleanCep = (c: string) => c.replace(/\D/g, "");
+
 
   const formatCpf = (value: string) => {
     const nums = value.replace(/\D/g, "").slice(0, 11);
@@ -443,7 +453,7 @@ const Checkout = () => {
         setTimeout(() => {
           pixSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 150);
-        sendUtmifyEvent("waiting_payment");
+        await sendUtmifyEvent("waiting_payment");
         sendNotifySale("pix_generated");
 
         if (transactionId) {
@@ -464,7 +474,8 @@ const Checkout = () => {
                   window.fbq?.('track', 'Purchase', { value: priceInCents / 100, currency: 'BRL' });
                 } catch {}
                 trackCart({ payment_status: "paid" });
-                sendUtmifyEvent("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
+                console.log("🔥 Firing UTMify PAID event via ref...");
+                await sendUtmifyEventRef.current("paid", new Date().toISOString().replace("T", " ").slice(0, 19));
                 sendNotifySale("pix_paid");
                 invokeWithKeepalive("meta-events", {
                   event_name: "Purchase",
