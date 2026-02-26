@@ -56,6 +56,9 @@ serve(async (req) => {
       );
     }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
+    const postbackUrl = `${supabaseUrl}/functions/v1/beehive-webhook`;
+
     // Build transaction payload
     const transactionPayload: Record<string, unknown> = {
       amount,
@@ -63,6 +66,7 @@ serve(async (req) => {
       customer,
       items,
       traceable: true,
+      postbackUrl,
     };
 
     if (paymentMethod === "credit_card") {
