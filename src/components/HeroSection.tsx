@@ -18,7 +18,7 @@ import seloRA from "@/assets/selo-ra.png";
 const productImages = [prod1, foto1, prod2, prod3, prod4, prod5, prod6, prod7];
 
 const HeroSection = () => {
-  const [selectedKit, setSelectedKit] = useState<"interno" | "completo">("completo");
+  const [selectedKit, setSelectedKit] = useState<"interno" | "completo">("interno");
   const [currentImage, setCurrentImage] = useState(0);
   const [showReview, setShowReview] = useState(false);
 
