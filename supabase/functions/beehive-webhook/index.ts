@@ -241,6 +241,63 @@ serve(async (req) => {
       console.error("❌ TikTok event error:", ttErr);
     }
 
+    // Fire DiaLOG webhook
+    try {
+      const dialogWebhookUrl = Deno.env.get("DIALOG_WEBHOOK_URL");
+      const dialogWebhookSecret = Deno.env.get("DIALOG_WEBHOOK_SECRET");
+
+      if (dialogWebhookUrl && dialogWebhookSecret) {
+        const dialogPayload = {
+          order_id: cart.utmify_order_id || cart.id,
+          status: "paid" as const,
+          customer: {
+            name: cart.name || "",
+            email: cart.email || "",
+            phone: cart.phone || "",
+            address: cart.address || "",
+            city: cart.city || "",
+            state: cart.state || "",
+            zip: cart.cep?.replace(/\D/g, "") || "",
+          },
+          products: [
+            {
+              name: kitLabel,
+              quantity: 1,
+              price: priceInCents / 100,
+            },
+          ],
+        };
+
+        const dialogBody = JSON.stringify(dialogPayload);
+        const encoder = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(dialogWebhookSecret),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign"]
+        );
+        const signatureBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(dialogBody));
+        const signature = Array.from(new Uint8Array(signatureBuffer))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+
+        const dialogRes = await fetch(dialogWebhookUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-webhook-signature": signature,
+          },
+          body: dialogBody,
+        });
+        console.log("✅ DiaLOG webhook sent:", dialogRes.status);
+      } else {
+        console.warn("⚠️ Missing DIALOG_WEBHOOK_URL or DIALOG_WEBHOOK_SECRET, skipping DiaLOG");
+      }
+    } catch (dialogErr) {
+      console.error("❌ DiaLOG webhook error:", dialogErr);
+    }
+
     return new Response(JSON.stringify({ ok: true, processed: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
