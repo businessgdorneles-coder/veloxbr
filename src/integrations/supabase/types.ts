@@ -50,6 +50,7 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          utmify_order_id: string | null
           vehicle_type: string | null
           year: string | null
         }
@@ -88,6 +89,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          utmify_order_id?: string | null
           vehicle_type?: string | null
           year?: string | null
         }
@@ -126,6 +128,7 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          utmify_order_id?: string | null
           vehicle_type?: string | null
           year?: string | null
         }

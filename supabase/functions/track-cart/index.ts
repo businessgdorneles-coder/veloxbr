@@ -56,6 +56,7 @@ serve(async (req) => {
       product_title, amount_cents, payment_method,
       payment_status, cep, city, state, address, user_agent,
       utm_source, utm_medium, utm_campaign, utm_content, utm_term, src, sck,
+      transaction_id, utmify_order_id,
     } = body;
 
     // Get IP from headers
@@ -105,6 +106,8 @@ serve(async (req) => {
     if (utm_term !== undefined) record.utm_term = utm_term;
     if (src !== undefined) record.src = src;
     if (sck !== undefined) record.sck = sck;
+    if (transaction_id !== undefined) record.transaction_id = transaction_id;
+    if (utmify_order_id !== undefined) record.utmify_order_id = utmify_order_id;
 
     let result;
     if (existing) {
