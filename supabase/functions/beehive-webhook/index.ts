@@ -26,8 +26,8 @@ serve(async (req) => {
 
     if (contentType.includes("application/json")) {
       const json = await req.json();
-      transactionId = json.id?.toString() || json.transaction?.id?.toString();
-      currentStatus = json.current_status || json.status || json.transaction?.status;
+      transactionId = json.id?.toString() || json.transaction?.id?.toString() || json.data?.id?.toString();
+      currentStatus = json.current_status || json.status || json.transaction?.status || json.data?.status;
       rawBody = JSON.stringify(json);
     } else {
       // Form-urlencoded (Pagar.me postback format)
