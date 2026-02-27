@@ -26,9 +26,22 @@ serve(async (req) => {
 
     if (contentType.includes("application/json")) {
       const json = await req.json();
-      transactionId = json.id?.toString() || json.transaction?.id?.toString() || json.data?.id?.toString();
-      currentStatus = json.current_status || json.status || json.transaction?.status || json.data?.status;
       rawBody = JSON.stringify(json);
+
+      // CRITICAL: Beehive postback nests the real transaction inside `data`.
+      // `json.id` is the EVENT id (different from the transaction id we stored).
+      // Always prefer `json.data.id` (the actual transaction) over `json.id` (the event).
+      const nested = json.data || json.transaction || {};
+      transactionId = nested.id?.toString() || json.id?.toString();
+      currentStatus = json.current_status || nested.status || json.status;
+
+      console.log("📦 Parsed webhook payload:", {
+        eventId: json.id,
+        nestedId: nested.id,
+        resolvedTransactionId: transactionId,
+        resolvedStatus: currentStatus,
+        type: json.type,
+      });
     } else {
       // Form-urlencoded (Pagar.me postback format)
       rawBody = await req.text();
