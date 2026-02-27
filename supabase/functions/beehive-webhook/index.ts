@@ -90,21 +90,24 @@ serve(async (req) => {
 
     console.log("✅ Found cart:", cart.id, "Customer:", cart.name, "UTMify Order:", cart.utmify_order_id);
 
-    // Update cart status to paid
-    await supabase
-      .from("abandoned_carts")
-      .update({ payment_status: "paid" })
-      .eq("id", cart.id);
-
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);
     const priceInCents = cart.amount_cents || 0;
     const kitLabel = cart.product_title || "Tapete Bandeja 3D";
 
+    // Generate utmify_order_id if missing (safety net)
+    const utmifyOrderId = cart.utmify_order_id || `VELOX-WH-${Date.now()}`;
+
+    // Update cart status to paid + ensure utmify_order_id is set
+    await supabase
+      .from("abandoned_carts")
+      .update({ payment_status: "paid", utmify_order_id: utmifyOrderId })
+      .eq("id", cart.id);
+
     // Fire UTMify paid event
     const utmifyToken = Deno.env.get("UTMIFY_API_TOKEN");
-    if (utmifyToken && cart.utmify_order_id) {
+    if (utmifyToken) {
       const utmifyPayload = {
-        orderId: cart.utmify_order_id,
+        orderId: utmifyOrderId,
         platform: "VeloxBR",
         paymentMethod: cart.payment_method === "credit_card" ? "credit_card" : "pix",
         status: "paid",
@@ -162,7 +165,7 @@ serve(async (req) => {
         console.error("❌ UTMify webhook error:", utmErr);
       }
     } else {
-      console.warn("⚠️ Missing UTMIFY_API_TOKEN or utmify_order_id, skipping UTMify");
+      console.warn("⚠️ Missing UTMIFY_API_TOKEN, skipping UTMify");
     }
 
     // Fire notify-sale (pix_paid) via internal call
@@ -248,7 +251,7 @@ serve(async (req) => {
 
       if (dialogWebhookUrl && dialogWebhookSecret) {
         const dialogPayload = {
-          order_id: cart.utmify_order_id || cart.id,
+          order_id: utmifyOrderId,
           status: "paid" as const,
           customer: {
             name: cart.name || "",

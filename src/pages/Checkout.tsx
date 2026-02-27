@@ -92,7 +92,7 @@ const Checkout = () => {
   // Scroll to top and track cart start
   useEffect(() => {
     window.scrollTo(0, 0);
-    trackCart({ payment_status: "cart_started" });
+    trackCart({ payment_status: "cart_started", utmify_order_id: utmifyOrderId });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load Beehive tokenization script
