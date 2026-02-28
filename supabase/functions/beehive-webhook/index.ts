@@ -306,7 +306,9 @@ serve(async (req) => {
           },
           body: dialogBody,
         });
-        console.log("✅ DiaLOG webhook sent:", dialogRes.status);
+        const dialogResText = await dialogRes.text();
+        console.log("✅ DiaLOG webhook sent:", dialogRes.status, dialogResText);
+        console.log("📦 DiaLOG payload sent:", JSON.stringify(dialogPayload.customer));
       } else {
         console.warn("⚠️ Missing DIALOG_WEBHOOK_URL or DIALOG_WEBHOOK_SECRET, skipping DiaLOG");
       }

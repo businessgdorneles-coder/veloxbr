@@ -781,7 +781,7 @@ const Checkout = () => {
                           cep: cleanCep(cep),
                           city: city.trim(),
                           state: uf.toUpperCase(),
-                          address: `${addressStreet.trim()}, ${addressNumber.trim()}`,
+                          address: `${addressStreet.trim()}, ${addressNumber.trim()}${complement.trim() ? ` - ${complement.trim()}` : ''} - ${neighborhood.trim()}`,
                           amount_cents: priceInCents,
                           product_title: kitLabel,
                         });
