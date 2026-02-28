@@ -816,8 +816,8 @@ const Checkout = () => {
                         />
                         <Truck className="w-5 h-5 text-primary shrink-0" />
                         <div className="flex-1">
-                          <p className="text-sm font-bold">Frete DiaLog</p>
-                          <p className="text-[11px] text-muted-foreground">Transportadora • Entrega rápida</p>
+                          <p className="text-sm font-bold">Frete Expresso</p>
+                          <p className="text-[11px] text-muted-foreground">Transportadora • Até 7 dias úteis</p>
                         </div>
                         <span className="text-sm font-bold">R$ 23,90</span>
                       </label>
@@ -1100,7 +1100,7 @@ const Checkout = () => {
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className={shippingOption === "free" ? "text-success font-medium" : ""}>Frete {shippingOption === "dialog" ? "DiaLog" : ""}</span>
+                  <span className={shippingOption === "free" ? "text-success font-medium" : ""}>Frete {shippingOption === "dialog" ? "Expresso" : ""}</span>
                   <span className={shippingOption === "free" ? "text-success font-bold" : "font-bold"}>
                     {shippingOption === "free" ? "Grátis" : `R$ ${shippingFeeFormatted}`}
                   </span>
