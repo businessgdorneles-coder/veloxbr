@@ -141,6 +141,7 @@ const Checkout = () => {
 
   // Step 3
   const [paymentMethod, setPaymentMethod] = useState<"pix" | "card">("pix");
+  const [shippingOption, setShippingOption] = useState<"free" | "dialog">("free");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
@@ -205,15 +206,18 @@ const Checkout = () => {
     };
   })();
 
+  const shippingFeeCents = shippingOption === "dialog" ? 2390 : 0;
   const basePriceInCents = orderData?.selectedKit === "completo" ? 22990 : 13990;
   const PIX_DISCOUNT = 0.05;
-  const priceInCents = paymentMethod === "pix"
+  const productPriceInCents = paymentMethod === "pix"
     ? Math.round(basePriceInCents * (1 - PIX_DISCOUNT))
     : basePriceInCents;
+  const priceInCents = productPriceInCents + shippingFeeCents;
   const priceFormatted = (priceInCents / 100).toFixed(2).replace(".", ",");
   const basePriceFormatted = (basePriceInCents / 100).toFixed(2).replace(".", ",");
   const discountInCents = basePriceInCents - Math.round(basePriceInCents * (1 - PIX_DISCOUNT));
   const discountFormatted = (discountInCents / 100).toFixed(2).replace(".", ",");
+  const shippingFeeFormatted = (shippingFeeCents / 100).toFixed(2).replace(".", ",");
   const kitLabel = orderData?.selectedKit === "completo"
     ? "Kit Tapetes Internos Bandeja + Porta-Malas"
     : "Kit Tapetes Internos Bandeja";
@@ -417,7 +421,7 @@ const Checkout = () => {
           },
         },
         shipping: {
-          fee: 0,
+          fee: shippingFeeCents,
           address: {
             street: addressStreet.trim(),
             streetNumber: addressNumber.trim(),
@@ -771,6 +775,55 @@ const Checkout = () => {
                       <input value={uf} onChange={(e) => setUf(e.target.value.toUpperCase())} placeholder="SP" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={2} />
                     </div>
                   </div>
+                  {/* Shipping Options */}
+                  <div className="pt-2">
+                    <label className="text-sm font-semibold block mb-2">Opção de Frete</label>
+                    <div className="space-y-2">
+                      <label
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          shippingOption === "free"
+                            ? "border-success bg-success/5"
+                            : "border-border hover:border-muted-foreground/30"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shipping"
+                          checked={shippingOption === "free"}
+                          onChange={() => setShippingOption("free")}
+                          className="accent-success w-4 h-4"
+                        />
+                        <Truck className="w-5 h-5 text-success shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-bold">Frete Grátis</p>
+                          <p className="text-[11px] text-muted-foreground">Até 15 dias úteis</p>
+                        </div>
+                        <span className="text-sm font-bold text-success">Grátis</span>
+                      </label>
+                      <label
+                        className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          shippingOption === "dialog"
+                            ? "border-success bg-success/5"
+                            : "border-border hover:border-muted-foreground/30"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shipping"
+                          checked={shippingOption === "dialog"}
+                          onChange={() => setShippingOption("dialog")}
+                          className="accent-success w-4 h-4"
+                        />
+                        <Truck className="w-5 h-5 text-primary shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-bold">Frete DiaLog</p>
+                          <p className="text-[11px] text-muted-foreground">Transportadora • Entrega rápida</p>
+                        </div>
+                        <span className="text-sm font-bold">R$ 23,90</span>
+                      </label>
+                    </div>
+                  </div>
+
                   <button
                     onClick={() => {
                       if (validateStep2()) {
@@ -1047,8 +1100,10 @@ const Checkout = () => {
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-success font-medium">Frete</span>
-                  <span className="text-success font-bold">Grátis</span>
+                  <span className={shippingOption === "free" ? "text-success font-medium" : ""}>Frete {shippingOption === "dialog" ? "DiaLog" : ""}</span>
+                  <span className={shippingOption === "free" ? "text-success font-bold" : "font-bold"}>
+                    {shippingOption === "free" ? "Grátis" : `R$ ${shippingFeeFormatted}`}
+                  </span>
                 </div>
               </div>
               <div className="flex justify-between items-center mt-4 pt-4 border-t border-border">
@@ -1082,7 +1137,7 @@ const Checkout = () => {
                 <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
                   <Truck className="w-5 h-5 text-success shrink-0" />
                   <div>
-                    <p className="text-[11px] font-bold leading-tight">Frete Grátis</p>
+                    <p className="text-[11px] font-bold leading-tight">Entrega Segura</p>
                     <p className="text-[9px] text-muted-foreground">Todo o Brasil</p>
                   </div>
                 </div>
