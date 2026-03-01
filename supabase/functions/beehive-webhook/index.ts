@@ -263,9 +263,36 @@ serve(async (req) => {
       const dialogWebhookSecret = Deno.env.get("DIALOG_WEBHOOK_SECRET");
 
       if (dialogWebhookUrl && dialogWebhookSecret) {
-        // Build full address from individual components (preferred) or fallback to concatenated
-        const fullAddress = cart.address_street
-          ? `${cart.address_street}, ${cart.address_number || "S/N"}${cart.address_complement ? ` - ${cart.address_complement}` : ""}${cart.neighborhood ? ` - ${cart.neighborhood}` : ""}`
+        // Parse address components: prefer individual fields, fallback to parsing concatenated string
+        // Concatenated format: "Rua X, 123 - Complemento - Bairro"
+        let addrStreet = cart.address_street || "";
+        let addrNumber = cart.address_number || "";
+        let addrComplement = cart.address_complement || "";
+        let addrNeighborhood = cart.neighborhood || "";
+
+        if (!addrStreet && cart.address) {
+          // Parse concatenated address: "Street, Number - Complement - Neighborhood"
+          const raw = cart.address;
+          const commaIdx = raw.indexOf(",");
+          if (commaIdx > 0) {
+            addrStreet = raw.substring(0, commaIdx).trim();
+            const rest = raw.substring(commaIdx + 1).trim();
+            const parts = rest.split(" - ").map((p: string) => p.trim());
+            addrNumber = parts[0] || "S/N";
+            if (parts.length === 3) {
+              addrComplement = parts[1] || "";
+              addrNeighborhood = parts[2] || "";
+            } else if (parts.length === 2) {
+              addrNeighborhood = parts[1] || "";
+            }
+          } else {
+            addrStreet = raw;
+            addrNumber = "S/N";
+          }
+        }
+
+        const fullAddress = addrStreet
+          ? `${addrStreet}, ${addrNumber || "S/N"}${addrComplement ? ` - ${addrComplement}` : ""}${addrNeighborhood ? ` - ${addrNeighborhood}` : ""}`
           : cart.address || "";
 
         const dialogPayload = {
@@ -275,10 +302,10 @@ serve(async (req) => {
             name: cart.name || "",
             email: cart.email || "",
             phone: cart.phone || "",
-            address: fullAddress,
-            number: cart.address_number || "",
-            complement: cart.address_complement || "",
-            neighborhood: cart.neighborhood || "",
+            address: addrStreet || fullAddress,
+            number: addrNumber || "S/N",
+            complement: addrComplement,
+            neighborhood: addrNeighborhood,
             city: cart.city || "",
             state: cart.state || "",
             zip: cart.cep?.replace(/\D/g, "") || "",
