@@ -17,6 +17,9 @@ export type Database = {
       abandoned_carts: {
         Row: {
           address: string | null
+          address_complement: string | null
+          address_number: string | null
+          address_street: string | null
           amount_cents: number | null
           brand: string | null
           card_brand: string | null
@@ -31,6 +34,7 @@ export type Database = {
           ip_address: string | null
           model: string | null
           name: string | null
+          neighborhood: string | null
           payment_method: string | null
           payment_status: string
           phone: string | null
@@ -56,6 +60,9 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
+          address_street?: string | null
           amount_cents?: number | null
           brand?: string | null
           card_brand?: string | null
@@ -70,6 +77,7 @@ export type Database = {
           ip_address?: string | null
           model?: string | null
           name?: string | null
+          neighborhood?: string | null
           payment_method?: string | null
           payment_status?: string
           phone?: string | null
@@ -95,6 +103,9 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
+          address_street?: string | null
           amount_cents?: number | null
           brand?: string | null
           card_brand?: string | null
@@ -109,6 +120,7 @@ export type Database = {
           ip_address?: string | null
           model?: string | null
           name?: string | null
+          neighborhood?: string | null
           payment_method?: string | null
           payment_status?: string
           phone?: string | null

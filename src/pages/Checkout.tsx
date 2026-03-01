@@ -835,6 +835,10 @@ const Checkout = () => {
                           city: city.trim(),
                           state: uf.toUpperCase(),
                           address: `${addressStreet.trim()}, ${addressNumber.trim()}${complement.trim() ? ` - ${complement.trim()}` : ''} - ${neighborhood.trim()}`,
+                          address_street: addressStreet.trim(),
+                          address_number: addressNumber.trim(),
+                          address_complement: complement.trim() || null,
+                          neighborhood: neighborhood.trim(),
                           amount_cents: priceInCents,
                           product_title: kitLabel,
                         });

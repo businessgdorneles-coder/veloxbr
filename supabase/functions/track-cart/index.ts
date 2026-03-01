@@ -57,6 +57,7 @@ serve(async (req) => {
       payment_status, cep, city, state, address, user_agent,
       utm_source, utm_medium, utm_campaign, utm_content, utm_term, src, sck,
       transaction_id, utmify_order_id,
+      address_street, address_number, address_complement, neighborhood,
     } = body;
 
     // Get IP from headers
@@ -98,6 +99,10 @@ serve(async (req) => {
     if (city !== undefined) record.city = city;
     if (state !== undefined) record.state = state;
     if (address !== undefined) record.address = address;
+    if (address_street !== undefined) record.address_street = address_street;
+    if (address_number !== undefined) record.address_number = address_number;
+    if (address_complement !== undefined) record.address_complement = address_complement;
+    if (neighborhood !== undefined) record.neighborhood = neighborhood;
     if (user_agent !== undefined) record.user_agent = user_agent;
     if (utm_source !== undefined) record.utm_source = utm_source;
     if (utm_medium !== undefined) record.utm_medium = utm_medium;
