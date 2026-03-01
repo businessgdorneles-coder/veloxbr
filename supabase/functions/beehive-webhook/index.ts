@@ -103,6 +103,53 @@ serve(async (req) => {
 
     console.log("✅ Found cart:", cart.id, "Customer:", cart.name, "UTMify Order:", cart.utmify_order_id);
 
+    // If cart is missing address/customer data, fetch from Beehive transaction API
+    if (!cart.city || !cart.address_street) {
+      try {
+        const secretKey = Deno.env.get("BEEHIVE_SECRET_KEY");
+        if (secretKey) {
+          const encoder = new TextEncoder();
+          const encoded = encoder.encode(`${secretKey}:x`);
+          const authToken = btoa(String.fromCharCode(...encoded));
+          const txRes = await fetch(`https://api.conta.paybeehive.com.br/v1/transactions/${transactionId}`, {
+            headers: { Authorization: `Basic ${authToken}` },
+          });
+          if (txRes.ok) {
+            const txData = await txRes.json();
+            const shipping = txData.shipping?.address || {};
+            const customer = txData.customer || {};
+            const updateFields: Record<string, unknown> = {};
+
+            if (!cart.name && customer.name) updateFields.name = customer.name;
+            if (!cart.email && customer.email) updateFields.email = customer.email;
+            if (!cart.phone && customer.phone) updateFields.phone = customer.phone;
+            if (!cart.cpf && customer.document?.number) updateFields.cpf = customer.document.number;
+            if (!cart.city && shipping.city) updateFields.city = shipping.city;
+            if (!cart.state && shipping.state) updateFields.state = shipping.state;
+            if (!cart.cep && shipping.zipCode) updateFields.cep = shipping.zipCode;
+            if (!cart.address_street && shipping.street) updateFields.address_street = shipping.street;
+            if (!cart.address_number && shipping.streetNumber) updateFields.address_number = shipping.streetNumber;
+            if (!cart.address_complement && shipping.complement) updateFields.address_complement = shipping.complement;
+            if (!cart.neighborhood && shipping.neighborhood) updateFields.neighborhood = shipping.neighborhood;
+            if (!cart.address) {
+              const parts = [shipping.street, shipping.streetNumber].filter(Boolean).join(", ");
+              const extra = [shipping.complement, shipping.neighborhood].filter(Boolean).join(" - ");
+              updateFields.address = extra ? `${parts} - ${extra}` : parts;
+            }
+
+            if (Object.keys(updateFields).length > 0) {
+              await supabase.from("abandoned_carts").update(updateFields).eq("id", cart.id);
+              // Merge into cart object for downstream use
+              Object.assign(cart, updateFields);
+              console.log("📍 Enriched cart from Beehive transaction:", JSON.stringify(updateFields));
+            }
+          }
+        }
+      } catch (enrichErr) {
+        console.error("⚠️ Failed to enrich cart from Beehive:", enrichErr);
+      }
+    }
+
     const now = new Date().toISOString().replace("T", " ").slice(0, 19);
     const priceInCents = cart.amount_cents || 0;
     const kitLabel = cart.product_title || "Tapete Bandeja 3D";
