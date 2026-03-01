@@ -263,6 +263,11 @@ serve(async (req) => {
       const dialogWebhookSecret = Deno.env.get("DIALOG_WEBHOOK_SECRET");
 
       if (dialogWebhookUrl && dialogWebhookSecret) {
+        // Build full address from individual components (preferred) or fallback to concatenated
+        const fullAddress = cart.address_street
+          ? `${cart.address_street}, ${cart.address_number || "S/N"}${cart.address_complement ? ` - ${cart.address_complement}` : ""}${cart.neighborhood ? ` - ${cart.neighborhood}` : ""}`
+          : cart.address || "";
+
         const dialogPayload = {
           order_id: utmifyOrderId,
           status: "paid" as const,
@@ -270,7 +275,10 @@ serve(async (req) => {
             name: cart.name || "",
             email: cart.email || "",
             phone: cart.phone || "",
-            address: cart.address || "",
+            address: fullAddress,
+            number: cart.address_number || "",
+            complement: cart.address_complement || "",
+            neighborhood: cart.neighborhood || "",
             city: cart.city || "",
             state: cart.state || "",
             zip: cart.cep?.replace(/\D/g, "") || "",
