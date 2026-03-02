@@ -1200,7 +1200,7 @@ const Checkout = () => {
             <div className="flex items-center gap-3">
               <img src={logoCheckout} alt="VeloxBR" className="h-6 object-contain opacity-80" />
               <div className="h-4 w-px bg-primary-foreground/15" />
-              <p className="text-[10px]">Velox Centro Automotivo LTDA • CNPJ: 64.809.798/0001-08</p>
+              <p className="text-[10px]">Velox Centro Automotivo LTDA • CNPJ: 13.310.559/0001-60</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
