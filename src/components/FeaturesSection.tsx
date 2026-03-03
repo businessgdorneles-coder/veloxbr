@@ -1,6 +1,6 @@
 import { ShieldCheck, Droplets, Wrench, Zap, Car, SprayCan } from "lucide-react";
 import prod1 from "@/assets/prod1.webp";
-import prod4 from "@/assets/prod4.png";
+import prod4 from "@/assets/prod4.webp";
 
 const features = [
   { icon: Wrench, title: "Instalação sem ferramentas", desc: "Colocou, encaixou — 2 minutos e está pronto." },

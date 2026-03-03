@@ -4,9 +4,9 @@ import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
-import logoCheckout from "@/assets/logo-veloxbr-checkout.png";
-import iconSsl from "@/assets/icon-ssl.png";
-import seloRA from "@/assets/selo-ra.png";
+import logoCheckout from "@/assets/logo-veloxbr-checkout.webp";
+import iconSsl from "@/assets/icon-ssl.webp";
+import seloRA from "@/assets/selo-ra.webp";
 
 declare global {
   interface Window {

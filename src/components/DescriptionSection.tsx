@@ -1,4 +1,4 @@
-import descricaoBanner from "@/assets/descricao-banner.png";
+import descricaoBanner from "@/assets/descricao-banner-new.webp";
 import antes1 from "@/assets/antes1.webp";
 import depois1 from "@/assets/depois1.webp";
 import antes2 from "@/assets/antes2.webp";
@@ -6,12 +6,12 @@ import depois2 from "@/assets/depois2.webp";
 import detalhe1 from "@/assets/detalhe1.webp";
 import detalhe2 from "@/assets/detalhe2.webp";
 import detalhe3 from "@/assets/detalhe3.webp";
-import tapeteInstalado from "@/assets/tapete-instalado.png";
-import satisfacao1 from "@/assets/satisfacao1.jpg";
-import satisfacao2 from "@/assets/satisfacao2.jpg";
-import satisfacao3 from "@/assets/satisfacao3.jpg";
-import satisfacao4 from "@/assets/satisfacao4.jpg";
-import satisfacao5 from "@/assets/satisfacao5.jpg";
+import tapeteInstalado from "@/assets/tapete-instalado.webp";
+import satisfacao1 from "@/assets/satisfacao1.webp";
+import satisfacao2 from "@/assets/satisfacao2.webp";
+import satisfacao3 from "@/assets/satisfacao3.webp";
+import satisfacao4 from "@/assets/satisfacao4.webp";
+import satisfacao5 from "@/assets/satisfacao5.webp";
 
 const features = [
   "✓ Borracha antiderrapante",

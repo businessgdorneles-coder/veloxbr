@@ -1,7 +1,7 @@
 import { Car, Sparkles, Shield, TrendingUp } from "lucide-react";
-import gallery1 from "@/assets/gallery-1.jpg";
-import gallery2 from "@/assets/gallery-2.jpg";
-import gallery3 from "@/assets/gallery-3.jpg";
+import gallery1 from "@/assets/gallery-1.webp";
+import gallery2 from "@/assets/gallery-2.webp";
+import gallery3 from "@/assets/gallery-3.webp";
 
 const emotions = [
   {

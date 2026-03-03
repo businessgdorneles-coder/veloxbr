@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Star, BadgeCheck, Play, Volume2, VolumeX, Quote } from "lucide-react";
 import { proxyUrl } from "@/lib/mediaProxy";
 
-import homem1 from "@/assets/homem1.jpg";
-import mulher1 from "@/assets/mulher1.jpg";
-import homem2 from "@/assets/homem2.jpg";
+import homem1 from "@/assets/homem1.webp";
+import mulher1 from "@/assets/mulher1.webp";
+import homem2 from "@/assets/homem2.webp";
 import mulher1_2 from "@/assets/mulher1-2.webp";
-import homem3 from "@/assets/homem3.jpg";
-import mulher3 from "@/assets/mulher3.png";
+import homem3 from "@/assets/homem3.webp";
+import mulher3 from "@/assets/mulher3.webp";
 
 const reviews = [
   {

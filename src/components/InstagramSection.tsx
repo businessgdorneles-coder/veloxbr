@@ -1,10 +1,10 @@
 import { Instagram, Heart, MessageCircle, ExternalLink } from "lucide-react";
-import gallery1 from "@/assets/gallery-1.jpg";
-import gallery2 from "@/assets/gallery-2.jpg";
-import gallery3 from "@/assets/gallery-3.jpg";
-import gallery4 from "@/assets/gallery-4.png";
-import gallery5 from "@/assets/gallery-5.jpg";
-import gallery6 from "@/assets/gallery-6.jpg";
+import gallery1 from "@/assets/gallery-1.webp";
+import gallery2 from "@/assets/gallery-2.webp";
+import gallery3 from "@/assets/gallery-3.webp";
+import gallery4 from "@/assets/gallery-4.webp";
+import gallery5 from "@/assets/gallery-5.webp";
+import gallery6 from "@/assets/gallery-6.webp";
 
 const posts = [
   { img: gallery1, likes: "1.2k", comments: "38" },

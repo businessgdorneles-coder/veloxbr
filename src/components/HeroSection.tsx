@@ -4,16 +4,16 @@ import { vehicleData } from "@/data/vehicleData";
 import OrderReviewPopup from "@/components/OrderReviewPopup";
 
 import prod1 from "@/assets/prod1.webp";
-import foto1 from "@/assets/foto1.png";
-import prod2 from "@/assets/prod2.jpg";
-import prod3 from "@/assets/prod3.jpg";
-import prod4 from "@/assets/prod4.png";
-import prod5 from "@/assets/prod5.png";
-import prod6 from "@/assets/prod6.png";
-import prod7 from "@/assets/prod7.png";
-import kitSem from "@/assets/kit-sem-portamalas.jpg";
-import kitCom from "@/assets/kit-com-portamalas.png";
-import seloRA from "@/assets/selo-ra.png";
+import foto1 from "@/assets/foto1.webp";
+import prod2 from "@/assets/prod2.webp";
+import prod3 from "@/assets/prod3.webp";
+import prod4 from "@/assets/prod4.webp";
+import prod5 from "@/assets/prod5.webp";
+import prod6 from "@/assets/prod6.webp";
+import prod7 from "@/assets/prod7.webp";
+import kitSem from "@/assets/kit-sem-portamalas.webp";
+import kitCom from "@/assets/kit-com-portamalas.webp";
+import seloRA from "@/assets/selo-ra.webp";
 
 const productImages = [prod1, foto1, prod2, prod3, prod4, prod5, prod6, prod7];
 

@@ -1,12 +1,12 @@
-import gallery7 from "@/assets/gallery-7.jpg";
-import foto1 from "@/assets/foto1.png";
-import gallery6 from "@/assets/gallery-6.jpg";
-import gallery5 from "@/assets/gallery-5.jpg";
-import gallery4 from "@/assets/gallery-4.png";
-import gallery3 from "@/assets/gallery-3.jpg";
-import gallery2 from "@/assets/gallery-2.jpg";
-import gallery1 from "@/assets/gallery-1.jpg";
-import foto5 from "@/assets/foto5.png";
+import gallery7 from "@/assets/gallery-7.webp";
+import foto1 from "@/assets/foto1.webp";
+import gallery6 from "@/assets/gallery-6.webp";
+import gallery5 from "@/assets/gallery-5.webp";
+import gallery4 from "@/assets/gallery-4.webp";
+import gallery3 from "@/assets/gallery-3.webp";
+import gallery2 from "@/assets/gallery-2.webp";
+import gallery1 from "@/assets/gallery-1.webp";
+import foto5 from "@/assets/foto5.webp";
 
 const galleryImages = [gallery7, foto1, gallery6, gallery5, gallery4, gallery3, gallery2, gallery1, foto5];
 
