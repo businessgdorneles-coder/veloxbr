@@ -469,16 +469,23 @@ const Checkout = () => {
         trackCart({ payment_status: "pix_generated", transaction_id: transactionId, utmify_order_id: utmifyOrderId });
         // Auto-scroll to PIX section after state update
         setTimeout(() => scrollToIfNeeded("step-3"), 300);
-        await sendUtmifyEvent("waiting_payment");
+        // Fire UTMify and notification WITHOUT blocking the UI
+        sendUtmifyEvent("waiting_payment").catch(() => {});
         sendNotifySale("pix_generated");
 
         if (transactionId) {
-          pixPollingRef.current = setInterval(async () => {
+          let pollCount = 0;
+          const doPoll = async () => {
+            pollCount++;
             try {
-              const { data: statusData } = await supabase.functions.invoke("create-transaction", {
+              const { data: statusData, error: pollError } = await supabase.functions.invoke("create-transaction", {
                 body: { checkStatus: true, transactionId },
               });
-              console.log("🔄 PIX polling status:", statusData?.status, statusData);
+              if (pollError) {
+                console.warn("⚠️ PIX poll error (will retry):", pollError);
+                return; // Don't stop polling on transient errors
+              }
+              console.log("🔄 PIX polling status:", statusData?.status, `(poll #${pollCount})`);
               if (statusData?.status === "paid" || statusData?.status === "authorized") {
                 if (pixPollingRef.current) {
                   clearInterval(pixPollingRef.current);
@@ -527,9 +534,12 @@ const Checkout = () => {
                 setTransactionStatus("paid");
               }
             } catch (pollErr) {
-              console.error("❌ PIX polling error:", pollErr);
+              console.warn("⚠️ PIX poll exception (will retry):", pollErr);
             }
-          }, 5000);
+          };
+          // Start polling: first poll at 3s, then every 5s
+          setTimeout(() => doPoll(), 3000);
+          pixPollingRef.current = setInterval(doPoll, 5000);
         }
       } else if (data?.status === "paid" || data?.status === "authorized") {
         const cardTransactionId = data?.id || data?.transactionId;
