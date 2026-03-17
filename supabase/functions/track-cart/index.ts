@@ -103,7 +103,7 @@ serve(async (req) => {
     if (address_number !== undefined) record.address_number = address_number;
     if (address_complement !== undefined) record.address_complement = address_complement;
     if (neighborhood !== undefined) record.neighborhood = neighborhood;
-    if (user_agent !== undefined) record.user_agent = user_agent;
+    
     if (utm_source !== undefined) record.utm_source = utm_source;
     if (utm_medium !== undefined) record.utm_medium = utm_medium;
     if (utm_campaign !== undefined) record.utm_campaign = utm_campaign;

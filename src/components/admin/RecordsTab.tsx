@@ -578,7 +578,7 @@ const RecordsTab = () => {
                 <div className="grid grid-cols-1 gap-x-4">
                   <DetailField label="Session ID" value={detailRecord.session_id} />
                   <DetailField label="IP" value={detailRecord.ip_address} />
-                  <DetailField label="User Agent" value={detailRecord.user_agent} />
+                  
                   <DetailField label="Criado em" value={new Date(detailRecord.created_at).toLocaleString("pt-BR")} />
                   <DetailField label="Atualizado em" value={new Date(detailRecord.updated_at).toLocaleString("pt-BR")} />
                   <DetailField label="ID" value={detailRecord.id} />
