@@ -128,6 +128,17 @@ const RecordsTab = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Close export menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const getExportData = async (exportAll = false) => {
     setExporting(true);
     try {
