@@ -77,6 +77,10 @@ const Footer = () => {
             <Shield className="w-3.5 h-3.5" />
             <span>Pagamento seguro • Ambiente protegido com SSL</span>
           </div>
+          <a href="https://instagram.com/lojaveloxbrasil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors">
+            <Instagram className="w-4 h-4" />
+            <span className="text-[11px]">@lojaveloxbrasil</span>
+          </a>
           <p className="text-white/20 text-[10px]">
             &copy; {new Date().getFullYear()} Velox LTDA. Todos os direitos reservados.
           </p>
