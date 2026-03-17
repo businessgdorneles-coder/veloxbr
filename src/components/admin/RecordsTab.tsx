@@ -387,11 +387,47 @@ const RecordsTab = () => {
         <Button variant="outline" size="sm" onClick={exportOldRecords} disabled={exporting}>
           <FileSpreadsheet className="w-4 h-4 mr-1" /> Exportar antigos
         </Button>
-        <Button variant="destructive" size="sm" onClick={deleteOldRecords} disabled={deletingOld}>
+        <Button variant="destructive" size="sm" onClick={handleDeleteOldClick} disabled={deletingOld}>
           {deletingOld ? <RefreshCw className="w-4 h-4 mr-1 animate-spin" /> : <Trash2 className="w-4 h-4 mr-1" />}
           Apagar antigos
         </Button>
       </div>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" /> Confirmar exclusão
+            </DialogTitle>
+            <DialogDescription>
+              Essa ação é irreversível. Os registros apagados não poderão ser recuperados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm">
+              Você está prestes a apagar{" "}
+              <strong>{cleanupCount !== null ? cleanupCount.toLocaleString("pt-BR") : "..."}</strong>{" "}
+              registros com mais de <strong>{cleanupDays} dias</strong>
+              {cleanupStatus !== "all" && (
+                <> com status <strong>{statusLabels[cleanupStatus]?.label || cleanupStatus}</strong></>
+              )}.
+            </p>
+            {countingOld && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <RefreshCw className="w-4 h-4 animate-spin" /> Contando registros...
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmDeleteOld} disabled={deletingOld || countingOld || cleanupCount === null || cleanupCount === 0}>
+              {deletingOld ? <RefreshCw className="w-4 h-4 mr-1 animate-spin" /> : <Trash2 className="w-4 h-4 mr-1" />}
+              Apagar {cleanupCount !== null ? cleanupCount.toLocaleString("pt-BR") : ""} registros
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {exporting && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-700 flex items-center gap-2">
