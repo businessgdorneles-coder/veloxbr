@@ -1,23 +1,24 @@
 
-## Adicionar "ou 3x de..." na seção produto
 
-### Alteração
+## Plano: Exibir todos os campos e corrigir exportação
 
-Inserir uma linha de texto abaixo do preço principal em `src/components/ProductSection.tsx`, entre o preço (`R$ 173,93` / `R$ 263,53`) e a linha de "apenas R$ X,XX por dia".
+### Problemas atuais
 
-### Valores calculados (3x sem juros)
+1. **Colunas faltando na tabela e exportação**: A tabela `abandoned_carts` tem 38 colunas, mas o painel mostra apenas 12. Faltam: `vehicle_type`, `selected_texture`, `product_title`, `address_street`, `address_number`, `address_complement`, `neighborhood`, `card_last4`, `card_brand`, `installments`, `transaction_id`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `src`, `sck`, `utmify_order_id`, `user_agent`, `session_id`, `address`, `updated_at`.
 
-- Kit interno: R$ 173,93 ÷ 3 = **R$ 57,98**
-- Kit completo: R$ 263,53 ÷ 3 = **R$ 87,84**
+2. **Bug na exportação**: O `export-records` no `admin-api` constrói filtros numa query mas faz o fetch em outra query separada sem aplicar os filtros — exporta tudo sempre.
 
-### Trecho a adicionar (linha 162, após o preço)
+### Alterações
 
-```tsx
-<p className="text-muted-foreground text-sm mb-1">
-  ou 3x de R$ {selectedKit === "interno" ? "57,98" : "87,84"} sem juros
-</p>
-```
+**1. `supabase/functions/admin-api/index.ts`**
+- Corrigir `export-records` para aplicar filtros na query real de paginação (usar a mesma query com filtros aplicados)
 
-### Arquivo afetado
+**2. `src/components/admin/RecordsTab.tsx`**
+- Expandir a interface `CartRecord` com todos os 38 campos
+- Na tabela visível: adicionar colunas para CPF, Endereço completo, Bairro, Parcelas, Cartão (últimos 4), Transação ID, UTMs completas (medium, campaign, content, term), src, sck
+- Implementar um painel de detalhes expandível ao clicar numa linha (drawer/modal) que mostra TODOS os campos do registro, incluindo session_id, user_agent, IP, etc.
+- Na exportação (CSV/XLSX/PDF): incluir TODOS os campos — headers e formatRow atualizados com as 38 colunas
+- Adicionar botão "Exportar Tudo" que ignora filtros e exporta os 24k+ registros completos
 
-- `src/components/ProductSection.tsx` — inserção de 1 linha após o preço principal
+A tabela principal terá scroll horizontal com as colunas mais importantes visíveis, e o modal de detalhe mostrará todos os dados organizados em seções.
+
