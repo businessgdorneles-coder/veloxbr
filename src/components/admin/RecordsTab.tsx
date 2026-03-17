@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Download, RefreshCw, ChevronLeft, ChevronRight, Search, FileSpreadsheet, FileText, Trash2, X, Eye } from "lucide-react";
+import { Download, RefreshCw, ChevronLeft, ChevronRight, Search, FileSpreadsheet, FileText, Trash2, X, Eye, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -103,6 +103,11 @@ const RecordsTab = () => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detailRecord, setDetailRecord] = useState<CartRecord | null>(null);
+  const [cleanupDays, setCleanupDays] = useState(7);
+  const [cleanupStatus, setCleanupStatus] = useState("all");
+  const [cleanupCount, setCleanupCount] = useState<number | null>(null);
+  const [countingOld, setCountingOld] = useState(false);
+  const [deletingOld, setDeletingOld] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -192,6 +197,62 @@ const RecordsTab = () => {
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
+  const fetchOldCount = async () => {
+    setCountingOld(true);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const { data } = await supabase.functions.invoke("admin-api", {
+        body: { action: "count-old-records", olderThanDays: cleanupDays, status: cleanupStatus },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCleanupCount(data?.count ?? 0);
+    } finally {
+      setCountingOld(false);
+    }
+  };
+
+  const exportOldRecords = async () => {
+    setExporting(true);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const { data } = await supabase.functions.invoke("admin-api", {
+        body: { action: "export-records", exportAll: true, olderThanDays: cleanupDays, statusFilter: cleanupStatus },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const all = data?.data || [];
+      const rows = all.map(formatFullRow);
+      const ws = XLSX.utils.aoa_to_sheet([allExportHeaders, ...rows]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Registros");
+      XLSX.writeFile(wb, `registros-antigos-${cleanupDays}dias-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const deleteOldRecords = async () => {
+    if (cleanupCount === null) {
+      await fetchOldCount();
+      return;
+    }
+    if (!confirm(`Tem certeza que deseja APAGAR ${cleanupCount.toLocaleString("pt-BR")} registros com mais de ${cleanupDays} dias?\n\nEssa ação é irreversível!`)) return;
+    setDeletingOld(true);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      await supabase.functions.invoke("admin-api", {
+        body: { action: "bulk-delete-old", olderThanDays: cleanupDays, status: cleanupStatus },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCleanupCount(null);
+      fetchData();
+    } finally {
+      setDeletingOld(false);
+    }
+  };
+
   const DetailField = ({ label, value }: { label: string; value: string | null | undefined }) => (
     <div className="py-1.5 px-2">
       <span className="text-xs text-muted-foreground block">{label}</span>
@@ -251,6 +312,44 @@ const RecordsTab = () => {
         </div>
         <button onClick={() => { setStatusFilter("all"); setDateFrom(""); setDateTo(""); setSearch(""); setPage(1); }}
           className="text-sm text-primary hover:underline">Limpar filtros</button>
+      </div>
+
+      {/* Cleanup section */}
+      <div className="bg-background border border-border rounded-xl p-4 flex flex-wrap gap-3 items-end">
+        <div className="flex items-center gap-2 mr-2">
+          <Clock className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-semibold">Limpeza</span>
+        </div>
+        <div>
+          <label className="text-xs font-semibold block mb-1">Mais antigos que</label>
+          <select value={cleanupDays} onChange={e => { setCleanupDays(Number(e.target.value)); setCleanupCount(null); }}
+            className="border border-border rounded-lg px-3 py-2 text-sm bg-background">
+            <option value={7}>7 dias</option>
+            <option value={15}>15 dias</option>
+            <option value={30}>30 dias</option>
+            <option value={60}>60 dias</option>
+            <option value={90}>90 dias</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs font-semibold block mb-1">Status</label>
+          <select value={cleanupStatus} onChange={e => { setCleanupStatus(e.target.value); setCleanupCount(null); }}
+            className="border border-border rounded-lg px-3 py-2 text-sm bg-background min-w-[160px]">
+            <option value="all">Todos</option>
+            {Object.entries(statusLabels).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          </select>
+        </div>
+        <Button variant="outline" size="sm" onClick={fetchOldCount} disabled={countingOld}>
+          {countingOld ? <RefreshCw className="w-4 h-4 mr-1 animate-spin" /> : <Search className="w-4 h-4 mr-1" />}
+          {cleanupCount !== null ? `${cleanupCount.toLocaleString("pt-BR")} encontrados` : "Contar"}
+        </Button>
+        <Button variant="outline" size="sm" onClick={exportOldRecords} disabled={exporting}>
+          <FileSpreadsheet className="w-4 h-4 mr-1" /> Exportar antigos
+        </Button>
+        <Button variant="destructive" size="sm" onClick={deleteOldRecords} disabled={deletingOld}>
+          {deletingOld ? <RefreshCw className="w-4 h-4 mr-1 animate-spin" /> : <Trash2 className="w-4 h-4 mr-1" />}
+          Apagar antigos
+        </Button>
       </div>
 
       {exporting && (
