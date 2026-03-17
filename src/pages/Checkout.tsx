@@ -635,9 +635,10 @@ const Checkout = () => {
           <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-success" />
           </div>
-          <h1 className="font-display text-2xl font-bold mb-2">Pedido confirmado! 🎉</h1>
+          <h1 className="font-display text-2xl font-bold mb-2">🔥 Parabéns pela sua escolha!</h1>
           <p className="text-muted-foreground text-sm mb-6">
-            Seu kit será fabricado sob medida e enviado em breve. Você receberá atualizações por e-mail.
+            Você acaba de garantir seu produto com a <strong className="text-foreground">Velox Brasil</strong>, referência em produtos automotivos.<br /><br />
+            Seu pedido já está sendo preparado com todo cuidado e em breve te enviamos a atualização de envio! 🚚
           </p>
           <button onClick={() => navigate("/")} className="bg-primary text-primary-foreground font-bold py-3 px-6 rounded-lg hover:brightness-110 transition-all">
             Voltar ao início
