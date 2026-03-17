@@ -47,7 +47,6 @@ interface CartRecord {
   sck: string | null;
   utmify_order_id: string | null;
   ip_address: string | null;
-  user_agent: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -72,7 +71,7 @@ const allExportHeaders = [
   "Valor (R$)", "Método Pgto", "Status", "Parcelas", "Bandeira Cartão", "Últimos 4", "ID Transação",
   "CEP", "Cidade", "Estado", "Endereço", "Rua", "Número", "Complemento", "Bairro",
   "UTM Source", "UTM Medium", "UTM Campaign", "UTM Content", "UTM Term", "src", "sck",
-  "Utmify Order ID", "IP", "User Agent", "Session ID",
+  "Utmify Order ID", "IP", "Session ID",
 ];
 
 const formatFullRow = (r: CartRecord): string[] => [
@@ -88,7 +87,7 @@ const formatFullRow = (r: CartRecord): string[] => [
   r.address_street || "", r.address_number || "", r.address_complement || "", r.neighborhood || "",
   r.utm_source || "", r.utm_medium || "", r.utm_campaign || "", r.utm_content || "", r.utm_term || "",
   r.src || "", r.sck || "", r.utmify_order_id || "",
-  r.ip_address || "", r.user_agent || "", r.session_id || "",
+  r.ip_address || "", r.session_id || "",
 ];
 
 const RecordsTab = () => {
@@ -579,7 +578,7 @@ const RecordsTab = () => {
                 <div className="grid grid-cols-1 gap-x-4">
                   <DetailField label="Session ID" value={detailRecord.session_id} />
                   <DetailField label="IP" value={detailRecord.ip_address} />
-                  <DetailField label="User Agent" value={detailRecord.user_agent} />
+                  
                   <DetailField label="Criado em" value={new Date(detailRecord.created_at).toLocaleString("pt-BR")} />
                   <DetailField label="Atualizado em" value={new Date(detailRecord.updated_at).toLocaleString("pt-BR")} />
                   <DetailField label="ID" value={detailRecord.id} />

@@ -54,7 +54,7 @@ serve(async (req) => {
       brand, model, year, vehicle_type,
       selected_color, selected_kit, selected_texture,
       product_title, amount_cents, payment_method,
-      payment_status, cep, city, state, address, user_agent,
+      payment_status, cep, city, state, address,
       utm_source, utm_medium, utm_campaign, utm_content, utm_term, src, sck,
       transaction_id, utmify_order_id,
       address_street, address_number, address_complement, neighborhood,
@@ -103,7 +103,7 @@ serve(async (req) => {
     if (address_number !== undefined) record.address_number = address_number;
     if (address_complement !== undefined) record.address_complement = address_complement;
     if (neighborhood !== undefined) record.neighborhood = neighborhood;
-    if (user_agent !== undefined) record.user_agent = user_agent;
+    
     if (utm_source !== undefined) record.utm_source = utm_source;
     if (utm_medium !== undefined) record.utm_medium = utm_medium;
     if (utm_campaign !== undefined) record.utm_campaign = utm_campaign;

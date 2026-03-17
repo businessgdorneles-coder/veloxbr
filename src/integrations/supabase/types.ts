@@ -48,7 +48,6 @@ export type Database = {
           state: string | null
           transaction_id: string | null
           updated_at: string
-          user_agent: string | null
           utm_campaign: string | null
           utm_content: string | null
           utm_medium: string | null
@@ -91,7 +90,6 @@ export type Database = {
           state?: string | null
           transaction_id?: string | null
           updated_at?: string
-          user_agent?: string | null
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
@@ -134,7 +132,6 @@ export type Database = {
           state?: string | null
           transaction_id?: string | null
           updated_at?: string
-          user_agent?: string | null
           utm_campaign?: string | null
           utm_content?: string | null
           utm_medium?: string | null
