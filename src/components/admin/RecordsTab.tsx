@@ -108,6 +108,9 @@ const RecordsTab = () => {
   const [cleanupCount, setCleanupCount] = useState<number | null>(null);
   const [countingOld, setCountingOld] = useState(false);
   const [deletingOld, setDeletingOld] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
