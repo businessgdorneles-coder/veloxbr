@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Clock, Shield, BadgeCheck } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Shield, BadgeCheck, Instagram } from "lucide-react";
 import logoVelox from "@/assets/logo-velox.webp";
 
 const Footer = () => {
@@ -53,6 +53,9 @@ const Footer = () => {
               <p className="flex items-center gap-2 text-white/50 text-xs justify-center sm:justify-start">
                 <Clock className="w-3.5 h-3.5 text-primary" /> Seg–Sex, 08h às 18h
               </p>
+              <a href="https://instagram.com/lojaveloxbrasil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-white text-xs transition-colors justify-center sm:justify-start">
+                <Instagram className="w-3.5 h-3.5 text-primary" /> @lojaveloxbrasil
+              </a>
             </div>
           </div>
 
