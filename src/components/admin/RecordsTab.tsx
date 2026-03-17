@@ -300,9 +300,24 @@ const RecordsTab = () => {
           <Button variant="outline" size="sm" onClick={() => exportCSV(false)} disabled={exporting}><Download className="w-4 h-4 mr-1" /> CSV</Button>
           <Button variant="outline" size="sm" onClick={() => exportXLSX(false)} disabled={exporting}><FileSpreadsheet className="w-4 h-4 mr-1" /> Excel</Button>
           <Button variant="outline" size="sm" onClick={() => exportPDF(false)} disabled={exporting}><FileText className="w-4 h-4 mr-1" /> PDF</Button>
-          <Button variant="default" size="sm" onClick={() => exportXLSX(true)} disabled={exporting} className="bg-green-600 hover:bg-green-700 text-white">
-            <Download className="w-4 h-4 mr-1" /> Exportar Tudo
-          </Button>
+          <div className="relative" ref={exportMenuRef}>
+            <Button variant="default" size="sm" onClick={() => setShowExportMenu(!showExportMenu)} disabled={exporting} className="bg-green-600 hover:bg-green-700 text-white">
+              <Download className="w-4 h-4 mr-1" /> Exportar Tudo <ChevronDown className="w-3 h-3 ml-1" />
+            </Button>
+            {showExportMenu && (
+              <div className="absolute right-0 top-full mt-1 z-50 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[160px]">
+                <button onClick={() => { exportXLSX(true); setShowExportMenu(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4" /> Excel (.xlsx)
+                </button>
+                <button onClick={() => { exportCSV(true); setShowExportMenu(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2">
+                  <Download className="w-4 h-4" /> CSV (.csv)
+                </button>
+                <button onClick={() => { exportPDF(true); setShowExportMenu(false); }} className="w-full text-left px-4 py-2 text-sm hover:bg-muted flex items-center gap-2">
+                  <FileText className="w-4 h-4" /> PDF (.pdf)
+                </button>
+              </div>
+            )}
+          </div>
           {selected.size > 0 && (
             <Button variant="destructive" size="sm" onClick={handleDeleteSelected}>
               <Trash2 className="w-4 h-4 mr-1" /> Excluir ({selected.size})
