@@ -56,7 +56,6 @@ const Footer = () => {
               <a href="https://instagram.com/lojaveloxbrasil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-white text-xs transition-colors justify-center sm:justify-start">
                 <Instagram className="w-3.5 h-3.5 text-primary" /> @lojaveloxbrasil
               </a>
-              </p>
             </div>
           </div>
 
