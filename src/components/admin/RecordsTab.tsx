@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Download, RefreshCw, ChevronLeft, ChevronRight, Search, FileSpreadsheet, FileText, Trash2, X, Eye } from "lucide-react";
+import { Download, RefreshCw, ChevronLeft, ChevronRight, Search, FileSpreadsheet, FileText, Trash2, X, Eye, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
