@@ -55,7 +55,6 @@ const Checkout = () => {
     supabase.functions.invoke("track-cart", {
       body: {
         session_id: sessionId,
-        user_agent: navigator.userAgent,
         brand: orderData?.brand,
         model: orderData?.model,
         year: orderData?.year,
