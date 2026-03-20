@@ -63,7 +63,7 @@ const Footer = () => {
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">Empresa</p>
             <div className="space-y-2">
               <p className="text-white/50 text-xs">Velox Centro Automotivo LTDA</p>
-              <p className="text-white/50 text-xs">CNPJ: 33.532.102/0001-83</p>
+              
               <p className="flex items-start gap-2 text-white/50 text-xs justify-center sm:justify-start">
                 <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                 Av. Jorge João Saad, SN Vl. Progredior – CEP: 05618-000 – São Paulo/SP
