@@ -126,7 +126,9 @@ const Checkout = () => {
   // Step 1
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneTouched, setPhoneTouched] = useState(false);
   const [cpf, setCpf] = useState("");
 
   // Step 2
@@ -319,10 +321,15 @@ const Checkout = () => {
 
   const formatPhone = (value: string) => {
     const nums = value.replace(/\D/g, "").slice(0, 11);
+    if (nums.length === 0) return "";
     if (nums.length <= 2) return `(${nums}`;
-    if (nums.length <= 7) return `(${nums.slice(0, 2)}) ${nums.slice(2)}`;
+    if (nums.length <= 6) return `(${nums.slice(0, 2)}) ${nums.slice(2)}`;
+    if (nums.length <= 10) return `(${nums.slice(0, 2)}) ${nums.slice(2, 6)}-${nums.slice(6)}`;
     return `(${nums.slice(0, 2)}) ${nums.slice(2, 7)}-${nums.slice(7)}`;
   };
+
+  const isEmailValid = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const isPhoneValid = (v: string) => cleanPhone(v).length >= 10;
 
   const handleCepChange = async (value: string) => {
     const formatted = value.replace(/\D/g, "").slice(0, 8);
@@ -723,7 +730,20 @@ const Checkout = () => {
                   </div>
                   <div>
                     <label className="text-sm font-semibold block mb-1">E-mail</label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={255} autoComplete="email" />
+                    <input
+                      type="email"
+                      inputMode="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value.toLowerCase().trim())}
+                      onBlur={() => setEmailTouched(true)}
+                      placeholder="seuemail@exemplo.com"
+                      className={`w-full border rounded-lg px-4 py-3 text-sm bg-background transition-colors ${emailTouched && !isEmailValid(email) ? "border-red-500 focus:outline-red-500" : "border-border"}`}
+                      maxLength={255}
+                      autoComplete="email"
+                    />
+                    {emailTouched && !isEmailValid(email) && (
+                      <p className="text-xs text-red-500 mt-1">Informe um e-mail válido (ex: nome@email.com)</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-semibold block mb-1">CPF</label>
@@ -731,7 +751,21 @@ const Checkout = () => {
                   </div>
                   <div>
                     <label className="text-sm font-semibold block mb-1">Celular / Whatsapp</label>
-                    <input type="tel" value={phone} onChange={(e) => setPhone(formatPhone(e.target.value))} placeholder="(11) 99999-9999" className="w-full border border-border rounded-lg px-4 py-3 text-sm bg-background" maxLength={15} autoComplete="tel" />
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      value={phone}
+                      onChange={(e) => setPhone(formatPhone(e.target.value))}
+                      onBlur={() => setPhoneTouched(true)}
+                      onKeyDown={(e) => { if (!/[\d\b\t]/.test(e.key) && !e.metaKey && !e.ctrlKey && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Tab") e.preventDefault(); }}
+                      placeholder="(11) 99999-9999"
+                      className={`w-full border rounded-lg px-4 py-3 text-sm bg-background transition-colors ${phoneTouched && !isPhoneValid(phone) ? "border-red-500 focus:outline-red-500" : "border-border"}`}
+                      maxLength={15}
+                      autoComplete="tel"
+                    />
+                    {phoneTouched && !isPhoneValid(phone) && (
+                      <p className="text-xs text-red-500 mt-1">Informe um celular válido com DDD (ex: (11) 99999-9999)</p>
+                    )}
                   </div>
                   <button
                     onClick={() => {
