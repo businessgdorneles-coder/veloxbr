@@ -1,4 +1,4 @@
-import descricaoBanner from "@/assets/descricao-banner-new.webp";
+import descricaoBanner from "@/assets/descricao-banner.webp";
 import antes1 from "@/assets/antes1.webp";
 import depois1 from "@/assets/depois1.webp";
 import antes2 from "@/assets/antes2.webp";
