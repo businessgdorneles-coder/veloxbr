@@ -6,13 +6,27 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function getIntegrationConfig(): Promise<Record<string, string>> {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const res = await fetch(`${supabaseUrl}/rest/v1/site_content?key=eq.integrations&select=value`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return (data?.[0]?.value as Record<string, string>) || {};
+  } catch { return {}; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const accessToken = Deno.env.get("TIKTOK_ACCESS_TOKEN");
+    const config = await getIntegrationConfig();
+    const accessToken = Deno.env.get("TIKTOK_ACCESS_TOKEN") || config.tiktok_token;
     const pixelCode = "D6BLOCJC77U2V3Q5KFF0";
 
     if (!accessToken) {
@@ -84,7 +98,7 @@ serve(async (req) => {
         ip: client_ip || "",
         user: userData,
         page: {
-          url: body.page_url || "https://carpet-craft-revive.lovable.app/checkout",
+          url: body.page_url || Deno.env.get("SITE_URL") || "https://kwtbwcwidcjrtsosbbpn.supabase.co",
         },
       },
       properties: {

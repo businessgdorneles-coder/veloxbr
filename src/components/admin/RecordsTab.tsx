@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Download, RefreshCw, ChevronLeft, ChevronRight, Search, FileSpreadsheet, FileText, Trash2, X, Eye, Clock, ChevronDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -113,19 +114,32 @@ const RecordsTab = () => {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token;
-    const { data } = await supabase.functions.invoke("admin-api", {
-      body: { action: "list-records", statusFilter, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, search: search || undefined, page, pageSize: PAGE_SIZE },
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setRecords(data?.data || []);
-    setTotalCount(data?.count || 0);
-    setSelected(new Set());
-    setLoading(false);
+    try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      const { data, error: fnErr } = await supabase.functions.invoke("admin-api", {
+        body: { action: "list-records", statusFilter, dateFrom: dateFrom || undefined, dateTo: dateTo || undefined, search: search || undefined, page, pageSize: PAGE_SIZE },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (fnErr) throw fnErr;
+      setRecords(data?.data || []);
+      setTotalCount(data?.count || 0);
+      setSelected(new Set());
+    } catch {
+      toast({ title: "Erro ao carregar registros", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   }, [statusFilter, dateFrom, dateTo, search, page]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  // Debounce search — only fires fetchData 400ms after user stops typing
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  useEffect(() => { fetchData(); }, [statusFilter, dateFrom, dateTo, debouncedSearch, page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close export menu on outside click
   useEffect(() => {

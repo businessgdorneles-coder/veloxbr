@@ -6,14 +6,28 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function getIntegrationConfig(): Promise<Record<string, string>> {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const res = await fetch(`${supabaseUrl}/rest/v1/site_content?key=eq.integrations&select=value`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return (data?.[0]?.value as Record<string, string>) || {};
+  } catch { return {}; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const pixelId = Deno.env.get("META_PIXEL_ID");
-    const accessToken = Deno.env.get("META_CONVERSION_API_TOKEN");
+    const config = await getIntegrationConfig();
+    const pixelId = Deno.env.get("META_PIXEL_ID") || config.meta_pixel_id;
+    const accessToken = Deno.env.get("META_CONVERSION_API_TOKEN") || config.meta_capi_token;
 
     if (!pixelId || !accessToken) {
       return new Response(

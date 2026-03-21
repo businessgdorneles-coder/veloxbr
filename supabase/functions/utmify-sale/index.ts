@@ -6,13 +6,27 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function getIntegrationConfig(): Promise<Record<string, string>> {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const res = await fetch(`${supabaseUrl}/rest/v1/site_content?key=eq.integrations&select=value`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!res.ok) return {};
+    const data = await res.json();
+    return (data?.[0]?.value as Record<string, string>) || {};
+  } catch { return {}; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const apiToken = Deno.env.get("UTMIFY_API_TOKEN");
+    const config = await getIntegrationConfig();
+    const apiToken = Deno.env.get("UTMIFY_API_TOKEN") || config.utmify_token;
     if (!apiToken) {
       return new Response(
         JSON.stringify({ error: "UTMIFY_API_TOKEN not configured" }),

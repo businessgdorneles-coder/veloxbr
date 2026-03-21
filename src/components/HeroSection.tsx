@@ -1,6 +1,5 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Check, ChevronLeft, ChevronRight, BadgeCheck, Star } from "lucide-react";
-import { vehicleData } from "@/data/vehicleData";
 import OrderReviewPopup from "@/components/OrderReviewPopup";
 
 import prod1 from "@/assets/prod1.webp";
@@ -17,6 +16,8 @@ import seloRA from "@/assets/selo-ra.webp";
 
 const productImages = [prod1, foto1, prod2, prod3, prod4, prod5, prod6, prod7];
 
+type VehicleData = Record<string, Record<string, Record<string, string[]>>>;
+
 const HeroSection = () => {
   const [selectedKit, setSelectedKit] = useState<"interno" | "completo">("completo");
   const [currentImage, setCurrentImage] = useState(0);
@@ -30,6 +31,15 @@ const HeroSection = () => {
   const [customModel, setCustomModel] = useState("");
   const [customYear, setCustomYear] = useState("");
 
+  const [selectedColor, setSelectedColor] = useState<string>("Preto");
+  const colors = ["Preto", "Bege", "Cinza", "Marrom"];
+
+  const [vehicleData, setVehicleData] = useState<VehicleData>({});
+
+  useEffect(() => {
+    import("@/data/vehicleData").then((m) => setVehicleData(m.vehicleData));
+  }, []);
+
   // Default to "carro" since reference doesn't show type selector
   const vehicleType = "carro";
 
@@ -37,17 +47,17 @@ const HeroSection = () => {
 
   const brands = useMemo(() => {
     return Object.keys(vehicleData[vehicleType] || {}).sort();
-  }, []);
+  }, [vehicleData]);
 
   const models = useMemo(() => {
     if (!brand) return [];
     return Object.keys(vehicleData[vehicleType]?.[brand] || {}).sort();
-  }, [brand]);
+  }, [brand, vehicleData]);
 
   const years = useMemo(() => {
     if (!brand || !model) return [];
     return vehicleData[vehicleType]?.[brand]?.[model] || [];
-  }, [brand, model]);
+  }, [brand, model, vehicleData]);
 
   const handleBrandChange = (value: string) => { setBrand(value); setModel(""); setYear(""); };
   const handleModelChange = (value: string) => { setModel(value); setYear(""); };
@@ -279,6 +289,31 @@ const HeroSection = () => {
             </div>
 
             {/* CTA */}
+            {/* Color selector */}
+            <div className="bg-card border border-border rounded-2xl p-4">
+              <h3 className="font-display font-bold text-sm text-foreground mb-3">Cor do Tapete</h3>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => {
+                  const colorMap: Record<string, string> = {
+                    Preto: "bg-gray-900",
+                    Bege: "bg-amber-200",
+                    Cinza: "bg-gray-400",
+                    Marrom: "bg-amber-800",
+                  };
+                  return (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-xs font-semibold transition-all ${selectedColor === color ? "border-success bg-success/5 text-foreground" : "border-border text-muted-foreground hover:border-success/40"}`}
+                    >
+                      <span className={`w-4 h-4 rounded-full ${colorMap[color]} shrink-0 border border-border/50`} />
+                      {color}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {(() => {
               const canProceed = year || (customVehicle && customModel.trim() && customYear.trim());
               return (
@@ -303,7 +338,7 @@ const HeroSection = () => {
         brand={customVehicle ? customModel.trim() : brand}
         model={customVehicle ? customModel.trim() : model}
         year={customVehicle ? customYear.trim() : year}
-        selectedColor="Preto"
+        selectedColor={selectedColor}
         selectedKit={selectedKit}
       />
     </section>

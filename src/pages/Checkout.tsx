@@ -4,7 +4,7 @@ import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import prod1 from "@/assets/prod1.webp";
-import logoCheckout from "@/assets/logo-veloxbr-checkout.webp";
+import logoCheckout from "@/assets/logo-velox.png";
 import iconSsl from "@/assets/icon-ssl.webp";
 import seloRA from "@/assets/selo-ra.webp";
 
@@ -71,7 +71,7 @@ const Checkout = () => {
         sck: utmParams.sck,
         ...payload,
       },
-    }).catch(() => {});
+    }).catch((err) => console.error("track-cart error:", err));
   };
 
   // Smart scroll: only scrolls if element is not already visible on screen
@@ -487,7 +487,7 @@ const Checkout = () => {
         // Auto-scroll to PIX section after state update
         setTimeout(() => scrollToIfNeeded("step-3"), 300);
         // Fire UTMify and notification WITHOUT blocking the UI
-        sendUtmifyEvent("waiting_payment").catch(() => {});
+        sendUtmifyEvent("waiting_payment").catch((err) => console.error("UTMify error:", err));
         sendNotifySale("pix_generated");
 
         if (transactionId) {

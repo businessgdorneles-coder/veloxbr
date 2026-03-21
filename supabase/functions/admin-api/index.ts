@@ -212,6 +212,37 @@ serve(async (req) => {
       return json({ count: count || 0 });
     }
 
+    // ── Integrations config ──
+    if (action === "get-integrations") {
+      const { data } = await adminClient.from("site_content").select("value").eq("key", "integrations").maybeSingle();
+      const config = (data?.value as Record<string, string>) || {};
+      // Mask tokens: return only whether they are set, not the actual values
+      return json({
+        meta_pixel_id: config.meta_pixel_id || "",
+        meta_capi_token: config.meta_capi_token ? "••••••••" : "",
+        tiktok_token: config.tiktok_token ? "••••••••" : "",
+        utmify_token: config.utmify_token ? "••••••••" : "",
+        meta_pixel_id_set: !!config.meta_pixel_id,
+        meta_capi_token_set: !!config.meta_capi_token,
+        tiktok_token_set: !!config.tiktok_token,
+        utmify_token_set: !!config.utmify_token,
+      });
+    }
+
+    if (action === "save-integrations") {
+      const { meta_pixel_id, meta_capi_token, tiktok_token, utmify_token } = body;
+      // Read existing config to preserve masked fields that weren't changed
+      const { data: existing } = await adminClient.from("site_content").select("value").eq("key", "integrations").maybeSingle();
+      const current = (existing?.value as Record<string, string>) || {};
+      const updated: Record<string, string> = { ...current };
+      if (meta_pixel_id !== undefined) updated.meta_pixel_id = meta_pixel_id;
+      if (meta_capi_token && meta_capi_token !== "••••••••") updated.meta_capi_token = meta_capi_token;
+      if (tiktok_token && tiktok_token !== "••••••••") updated.tiktok_token = tiktok_token;
+      if (utmify_token && utmify_token !== "••••••••") updated.utmify_token = utmify_token;
+      await adminClient.from("site_content").upsert({ key: "integrations", value: updated }, { onConflict: "key" });
+      return json({ success: true });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (error) {
     return json({ error: error.message }, 500);

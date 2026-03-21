@@ -163,103 +163,70 @@ serve(async (req) => {
       .update({ payment_status: "paid", utmify_order_id: utmifyOrderId })
       .eq("id", cart.id);
 
-    // Fire UTMify paid event
+    // Fire all downstream integrations in parallel
     const utmifyToken = Deno.env.get("UTMIFY_API_TOKEN");
-    if (utmifyToken) {
-      const utmifyPayload = {
-        orderId: utmifyOrderId,
-        platform: "VeloxBR",
-        paymentMethod: cart.payment_method === "credit_card" ? "credit_card" : "pix",
-        status: "paid",
-        createdAt: cart.created_at?.replace("T", " ").slice(0, 19) || now,
-        approvedDate: now,
-        refundedAt: null,
-        customer: {
-          name: cart.name || "",
-          email: cart.email || "",
-          phone: cart.phone || null,
-          document: cart.cpf || null,
-          country: "BR",
-        },
-        products: [
-          {
-            id: cart.selected_kit === "completo" ? "kit-completo" : "kit-interno",
-            name: kitLabel,
-            planId: null,
-            planName: null,
-            quantity: 1,
-            priceInCents,
-          },
-        ],
-        trackingParameters: {
-          src: cart.src || null,
-          sck: cart.sck || null,
-          utm_source: cart.utm_source || null,
-          utm_campaign: cart.utm_campaign || null,
-          utm_medium: cart.utm_medium || null,
-          utm_content: cart.utm_content || null,
-          utm_term: cart.utm_term || null,
-        },
-        commission: {
-          totalPriceInCents: priceInCents,
-          gatewayFeeInCents: 0,
-          userCommissionInCents: priceInCents,
-          currency: "BRL",
-        },
-      };
 
-      console.log("📤 Sending UTMify PAID (webhook):", JSON.stringify(utmifyPayload));
+    const utmifyPayload = {
+      orderId: utmifyOrderId,
+      platform: "VeloxBR",
+      paymentMethod: cart.payment_method === "credit_card" ? "credit_card" : "pix",
+      status: "paid",
+      createdAt: cart.created_at?.replace("T", " ").slice(0, 19) || now,
+      approvedDate: now,
+      refundedAt: null,
+      customer: {
+        name: cart.name || "",
+        email: cart.email || "",
+        phone: cart.phone || null,
+        document: cart.cpf || null,
+        country: "BR",
+      },
+      products: [
+        {
+          id: cart.selected_kit === "completo" ? "kit-completo" : "kit-interno",
+          name: kitLabel,
+          planId: null,
+          planName: null,
+          quantity: 1,
+          priceInCents,
+        },
+      ],
+      trackingParameters: {
+        src: cart.src || null,
+        sck: cart.sck || null,
+        utm_source: cart.utm_source || null,
+        utm_campaign: cart.utm_campaign || null,
+        utm_medium: cart.utm_medium || null,
+        utm_content: cart.utm_content || null,
+        utm_term: cart.utm_term || null,
+      },
+      commission: {
+        totalPriceInCents: priceInCents,
+        gatewayFeeInCents: 0,
+        userCommissionInCents: priceInCents,
+        currency: "BRL",
+      },
+    };
 
-      try {
-        const utmRes = await fetch("https://api.utmify.com.br/api-credentials/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-token": utmifyToken,
-          },
-          body: JSON.stringify(utmifyPayload),
-        });
-        const utmData = await utmRes.text();
-        console.log("✅ UTMify webhook response:", utmRes.status, utmData);
-      } catch (utmErr) {
-        console.error("❌ UTMify webhook error:", utmErr);
-      }
-    } else {
-      console.warn("⚠️ Missing UTMIFY_API_TOKEN, skipping UTMify");
-    }
-
-    // Fire notify-sale (pix_paid) via internal call
-    try {
-      const notifyUrl = `${supabaseUrl}/functions/v1/notify-sale`;
-      await fetch(notifyUrl, {
+    const integrationCalls: Promise<unknown>[] = [
+      // Notify-sale
+      fetch(`${supabaseUrl}/functions/v1/notify-sale`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${serviceRoleKey}`,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
         body: JSON.stringify({
           customerName: cart.name || "Cliente",
           amount: priceInCents,
-          paymentMethod: "pix",
+          paymentMethod: cart.payment_method || "pix",
           product: kitLabel,
           city: cart.city || "Brasil",
           notificationType: "pix_paid",
         }),
-      });
-      console.log("✅ Notify-sale (pix_paid) sent via webhook");
-    } catch (notifyErr) {
-      console.error("❌ Notify-sale error:", notifyErr);
-    }
+      }).then(() => console.log("✅ Notify-sale sent")).catch((e) => console.error("❌ Notify-sale error:", e)),
 
-    // Fire Meta CAPI Purchase event
-    try {
-      const metaUrl = `${supabaseUrl}/functions/v1/meta-events`;
-      await fetch(metaUrl, {
+      // Meta CAPI
+      fetch(`${supabaseUrl}/functions/v1/meta-events`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${serviceRoleKey}`,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
         body: JSON.stringify({
           event_name: "Purchase",
           value: priceInCents / 100,
@@ -272,21 +239,12 @@ serve(async (req) => {
           zip: cart.cep?.replace(/\D/g, "") || "",
           action_source: "system_generated",
         }),
-      });
-      console.log("✅ Meta Purchase event sent via webhook");
-    } catch (metaErr) {
-      console.error("❌ Meta event error:", metaErr);
-    }
+      }).then(() => console.log("✅ Meta event sent")).catch((e) => console.error("❌ Meta event error:", e)),
 
-    // Fire TikTok CompletePayment event
-    try {
-      const ttUrl = `${supabaseUrl}/functions/v1/tiktok-events`;
-      await fetch(ttUrl, {
+      // TikTok
+      fetch(`${supabaseUrl}/functions/v1/tiktok-events`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${serviceRoleKey}`,
-        },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
         body: JSON.stringify({
           event: "CompletePayment",
           value: priceInCents / 100,
@@ -298,11 +256,26 @@ serve(async (req) => {
           state: cart.state || "",
           zip: cart.cep?.replace(/\D/g, "") || "",
         }),
-      });
-      console.log("✅ TikTok event sent via webhook");
-    } catch (ttErr) {
-      console.error("❌ TikTok event error:", ttErr);
+      }).then(() => console.log("✅ TikTok event sent")).catch((e) => console.error("❌ TikTok event error:", e)),
+    ];
+
+    // UTMify (conditional)
+    if (utmifyToken) {
+      console.log("📤 Sending UTMify PAID (webhook):", JSON.stringify(utmifyPayload));
+      integrationCalls.push(
+        fetch("https://api.utmify.com.br/api-credentials/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-api-token": utmifyToken },
+          body: JSON.stringify(utmifyPayload),
+        }).then(async (r) => console.log("✅ UTMify response:", r.status, await r.text()))
+          .catch((e) => console.error("❌ UTMify error:", e))
+      );
+    } else {
+      console.warn("⚠️ Missing UTMIFY_API_TOKEN, skipping UTMify");
     }
+
+    await Promise.allSettled(integrationCalls);
+    console.log("✅ All integrations fired in parallel");
 
     // Fire DiaLOG webhook
     try {
