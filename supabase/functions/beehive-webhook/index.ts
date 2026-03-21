@@ -17,33 +17,45 @@ serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    // Beehive sends postback as form-urlencoded (Pagar.me format) or JSON
+    const contentType = req.headers.get("content-type") || "";
     let transactionId: string | null = null;
     let currentStatus: string | null = null;
     let rawBody: string | null = null;
 
-    const contentType = req.headers.get("content-type") || "";
-
     if (contentType.includes("application/json")) {
       const json = await req.json();
       rawBody = JSON.stringify(json);
+      const type = json.type as string | undefined;
 
-      // CRITICAL: Beehive postback nests the real transaction inside `data`.
-      // `json.id` is the EVENT id (different from the transaction id we stored).
-      // Always prefer `json.data.id` (the actual transaction) over `json.id` (the event).
-      const nested = json.data || json.transaction || {};
-      transactionId = nested.id?.toString() || json.id?.toString();
-      currentStatus = json.current_status || nested.status || json.status;
+      if (type === "transfer") {
+        // Transfers are not related to orders — just acknowledge
+        console.log("📩 Transfer postback received, status:", json.data?.status);
+        return new Response(JSON.stringify({ ok: true, ignored: true, type: "transfer" }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
 
-      console.log("📦 Parsed webhook payload:", {
+      if (type === "checkout") {
+        // Checkout postback: transaction is nested inside data.transaction
+        const tx = json.data?.transaction;
+        transactionId = tx?.id?.toString() ?? null;
+        currentStatus = tx?.status ?? null;
+      } else {
+        // type === "transaction" (or legacy format without type field)
+        // json.id = event ID, json.data.id = actual transaction ID
+        transactionId = json.data?.id?.toString() ?? json.id?.toString() ?? null;
+        currentStatus = json.data?.status ?? json.current_status ?? json.status ?? null;
+      }
+
+      console.log("📦 Beehive postback parsed:", {
+        type,
         eventId: json.id,
-        nestedId: nested.id,
-        resolvedTransactionId: transactionId,
-        resolvedStatus: currentStatus,
-        type: json.type,
+        transactionId,
+        currentStatus,
       });
     } else {
-      // Form-urlencoded (Pagar.me postback format)
+      // Form-urlencoded (legacy Pagar.me format)
       rawBody = await req.text();
       const params = new URLSearchParams(rawBody);
       transactionId = params.get("id") || params.get("transaction[id]");
