@@ -1,7 +1,7 @@
-import { BarChart3, Table2, FileText, Star, LogOut, Plug, Image, DollarSign } from "lucide-react";
+import { BarChart3, Table2, FileText, Star, LogOut, Plug, Image, DollarSign, Radio } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "dashboard" | "records" | "prices" | "images" | "reviews" | "texts" | "integrations";
+type Tab = "dashboard" | "realtime" | "records" | "prices" | "images" | "reviews" | "texts" | "integrations";
 
 interface AdminSidebarProps {
   active: Tab;
@@ -10,6 +10,7 @@ interface AdminSidebarProps {
 
 const tabs = [
   { id: "dashboard" as Tab, label: "Dashboard", icon: BarChart3 },
+  { id: "realtime" as Tab, label: "Tempo Real", icon: Radio },
   { id: "records" as Tab, label: "Registros", icon: Table2 },
   { id: "prices" as Tab, label: "Preços", icon: DollarSign },
   { id: "images" as Tab, label: "Imagens", icon: Image },

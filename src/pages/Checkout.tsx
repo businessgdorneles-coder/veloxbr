@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Lock, ChevronRight, Star, ShieldCheck, Loader2, Copy, Check, BadgeCheck, Truck, RotateCcw, Headphones, Award, Clock, Smartphone, QrCode, CircleDollarSign, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 import prod1 from "@/assets/prod1.webp";
 import logoCheckout from "@/assets/logo-velox.png";
 import iconSsl from "@/assets/icon-ssl.webp";
@@ -114,6 +115,7 @@ const Checkout = () => {
   // Steps
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
+  useVisitorTracking("checkout", currentStep);
   
   const pixPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

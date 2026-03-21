@@ -3,6 +3,7 @@ import MarqueeBar from "@/components/MarqueeBar";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
+import { useVisitorTracking } from "@/hooks/useVisitorTracking";
 
 const DescriptionSection = lazy(() => import("@/components/DescriptionSection"));
 const ReviewsSection = lazy(() => import("@/components/ReviewsSection"));
@@ -14,6 +15,8 @@ const LazySection = ({ children }: { children: React.ReactNode }) => (
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"];
 
 const Index = () => {
+  useVisitorTracking("home");
+
   // Persist UTM params from URL to sessionStorage so they survive navigation to /checkout
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLogin from "@/components/admin/AdminLogin";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import DashboardTab from "@/components/admin/DashboardTab";
+import RealTimeTab from "@/components/admin/RealTimeTab";
 import RecordsTab from "@/components/admin/RecordsTab";
 import ContentTab from "@/components/admin/ContentTab";
 import ReviewsTab from "@/components/admin/ReviewsTab";
 import IntegrationsTab from "@/components/admin/IntegrationsTab";
 
-type Tab = "dashboard" | "records" | "prices" | "images" | "reviews" | "texts" | "integrations";
+type Tab = "dashboard" | "realtime" | "records" | "prices" | "images" | "reviews" | "texts" | "integrations";
 
 const Admin = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -36,6 +37,7 @@ const Admin = () => {
       <AdminSidebar active={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 p-6 overflow-auto">
         {activeTab === "dashboard" && <DashboardTab />}
+        {activeTab === "realtime" && <RealTimeTab />}
         {activeTab === "records" && <RecordsTab />}
         {activeTab === "prices" && <ContentTab section="prices" />}
         {activeTab === "images" && <ContentTab section="images" />}
