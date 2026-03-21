@@ -127,6 +127,7 @@ const Checkout = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [cpf, setCpf] = useState("");
@@ -330,6 +331,48 @@ const Checkout = () => {
 
   const isEmailValid = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
   const isPhoneValid = (v: string) => cleanPhone(v).length >= 10;
+
+  const KNOWN_DOMAINS = [
+    "gmail.com", "googlemail.com",
+    "hotmail.com", "hotmail.com.br",
+    "outlook.com", "outlook.com.br",
+    "live.com", "live.com.br",
+    "yahoo.com", "yahoo.com.br",
+    "icloud.com", "me.com", "mac.com",
+    "uol.com.br", "bol.com.br", "ig.com.br",
+    "terra.com.br", "globo.com", "r7.com",
+    "protonmail.com", "proton.me",
+  ];
+
+  const levenshtein = (a: string, b: string): number => {
+    const m = a.length, n = b.length;
+    const dp = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+    for (let i = 1; i <= m; i++)
+      for (let j = 1; j <= n; j++)
+        dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    return dp[m][n];
+  };
+
+  const suggestEmailDomain = (val: string): string | null => {
+    const atIdx = val.indexOf("@");
+    if (atIdx < 1) return null;
+    const local = val.slice(0, atIdx);
+    const typed = val.slice(atIdx + 1).toLowerCase();
+    if (!typed || typed.length < 2) return null;
+    // If typed domain already has a dot and matches a known domain exactly, no suggestion
+    if (KNOWN_DOMAINS.includes(typed)) return null;
+    // If typed domain has a dot and doesn't match any known domain, allow custom domains
+    // Only suggest if distance is small (likely a typo, not intentional custom domain)
+    let best: string | null = null;
+    let bestDist = Infinity;
+    for (const domain of KNOWN_DOMAINS) {
+      const dist = levenshtein(typed, domain);
+      if (dist < bestDist) { bestDist = dist; best = domain; }
+    }
+    // Only suggest if distance <= 2 (typo), not for clearly custom domains
+    if (best && bestDist <= 2) return `${local}@${best}`;
+    return null;
+  };
 
   const handleCepChange = async (value: string) => {
     const formatted = value.replace(/\D/g, "").slice(0, 8);
@@ -734,15 +777,35 @@ const Checkout = () => {
                       type="email"
                       inputMode="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value.toLowerCase().trim())}
-                      onBlur={() => setEmailTouched(true)}
+                      onChange={(e) => {
+                        const val = e.target.value.toLowerCase().trimStart();
+                        setEmail(val);
+                        setEmailSuggestion(suggestEmailDomain(val));
+                      }}
+                      onBlur={() => {
+                        setEmailTouched(true);
+                        setEmailSuggestion(suggestEmailDomain(email));
+                      }}
                       placeholder="seuemail@exemplo.com"
                       className={`w-full border rounded-lg px-4 py-3 text-sm bg-background transition-colors ${emailTouched && !isEmailValid(email) ? "border-red-500 focus:outline-red-500" : "border-border"}`}
                       maxLength={255}
                       autoComplete="email"
                     />
-                    {emailTouched && !isEmailValid(email) && (
-                      <p className="text-xs text-red-500 mt-1">Informe um e-mail válido (ex: nome@email.com)</p>
+                    {emailSuggestion && (
+                      <p className="text-xs text-amber-600 mt-1">
+                        Você quis dizer{" "}
+                        <button
+                          type="button"
+                          className="font-semibold underline hover:text-amber-700"
+                          onClick={() => { setEmail(emailSuggestion); setEmailSuggestion(null); setEmailTouched(false); }}
+                        >
+                          {emailSuggestion}
+                        </button>
+                        ?
+                      </p>
+                    )}
+                    {emailTouched && !isEmailValid(email) && !emailSuggestion && (
+                      <p className="text-xs text-red-500 mt-1">Informe um e-mail válido (ex: nome@gmail.com)</p>
                     )}
                   </div>
                   <div>
