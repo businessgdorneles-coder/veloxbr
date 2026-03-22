@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Zap, AlertCircle, Loader2 } from "lucide-react";
 
 interface AdminLoginProps {
   onLogin: () => void;
@@ -45,65 +44,90 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
-      <div className="bg-background border border-border rounded-xl p-8 max-w-sm w-full shadow-lg">
-        <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-            <LogIn className="w-6 h-6 text-primary" />
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      {/* Background glow */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-sm">
+        {/* Brand */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/30 mb-4">
+            <Zap className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-xl font-bold">Painel Administrativo</h1>
-          <p className="text-sm text-muted-foreground mt-1">Faça login para continuar</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">VeloxBR</h1>
+          <p className="text-slate-400 text-sm mt-1">Painel Administrativo</p>
         </div>
 
-        {error && (
-          <div className="text-sm text-destructive text-center mb-4 bg-destructive/10 px-3 py-2 rounded">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              ref={emailRef}
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="admin@email.com"
-              autoComplete="email"
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <Label htmlFor="password">Senha</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder="••••••••"
-                autoComplete="current-password"
-                disabled={loading}
-                className="pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+        {/* Card */}
+        <div className="bg-slate-800/80 backdrop-blur border border-slate-700/60 rounded-2xl p-7 shadow-2xl">
+          {error && (
+            <div className="flex items-center gap-2.5 text-sm text-red-400 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl mb-5">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {error}
             </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-slate-300 text-sm font-medium">E-mail</Label>
+              <Input
+                id="email"
+                ref={emailRef}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKey}
+                placeholder="admin@veloxbr.com"
+                autoComplete="email"
+                disabled={loading}
+                className="bg-slate-700/60 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 h-11"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-slate-300 text-sm font-medium">Senha</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKey}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  disabled={loading}
+                  className="bg-slate-700/60 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500/20 h-11 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full h-11 mt-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Entrando...</>
+              ) : (
+                "Entrar"
+              )}
+            </button>
           </div>
-          <Button onClick={handleLogin} disabled={loading} className="w-full">
-            {loading ? "Entrando..." : "Entrar"}
-          </Button>
         </div>
+
+        <p className="text-center text-slate-600 text-xs mt-6">
+          © {new Date().getFullYear()} VeloxBR · Acesso restrito
+        </p>
       </div>
     </div>
   );
