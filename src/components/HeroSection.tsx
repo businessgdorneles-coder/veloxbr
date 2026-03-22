@@ -31,8 +31,7 @@ const HeroSection = () => {
   const [customModel, setCustomModel] = useState("");
   const [customYear, setCustomYear] = useState("");
 
-  const [selectedColor, setSelectedColor] = useState<string>("Preto");
-  const colors = ["Preto", "Bege", "Cinza", "Marrom"];
+  const selectedColor = "Preto";
 
   const [vehicleData, setVehicleData] = useState<VehicleData>({});
 
@@ -288,29 +287,14 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* CTA */}
-            {/* Color selector */}
+            {/* Cor do Tapete — apenas Preto */}
             <div className="bg-card border border-border rounded-2xl p-4">
               <h3 className="font-display font-bold text-sm text-foreground mb-3">Cor do Tapete</h3>
               <div className="flex flex-wrap gap-2">
-                {colors.map((color) => {
-                  const colorMap: Record<string, string> = {
-                    Preto: "bg-gray-900",
-                    Bege: "bg-amber-200",
-                    Cinza: "bg-gray-400",
-                    Marrom: "bg-amber-800",
-                  };
-                  return (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-xs font-semibold transition-all ${selectedColor === color ? "border-success bg-success/5 text-foreground" : "border-border text-muted-foreground hover:border-success/40"}`}
-                    >
-                      <span className={`w-4 h-4 rounded-full ${colorMap[color]} shrink-0 border border-border/50`} />
-                      {color}
-                    </button>
-                  );
-                })}
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-success bg-success/5 text-xs font-semibold text-foreground">
+                  <span className="w-4 h-4 rounded-full bg-gray-900 shrink-0 border border-border/50" />
+                  Preto
+                </div>
               </div>
             </div>
 
