@@ -12,10 +12,28 @@ import IntegrationsTab from "@/components/admin/IntegrationsTab";
 
 type Tab = "dashboard" | "realtime" | "records" | "prices" | "images" | "reviews" | "texts" | "integrations";
 
+const VALID_TABS: Tab[] = ["dashboard", "realtime", "records", "prices", "images", "reviews", "texts", "integrations"];
+
+const getTabFromHash = (): Tab => {
+  const hash = window.location.hash.replace("#", "") as Tab;
+  return VALID_TABS.includes(hash) ? hash : "dashboard";
+};
+
 const Admin = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash);
+
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+  };
+
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(getTabFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -34,7 +52,7 @@ const Admin = () => {
 
   return (
     <div className="flex min-h-screen bg-muted/30">
-      <AdminSidebar active={activeTab} onTabChange={setActiveTab} />
+      <AdminSidebar active={activeTab} onTabChange={handleTabChange} />
       <main className="flex-1 p-6 overflow-auto">
         {activeTab === "dashboard" && <DashboardTab />}
         {activeTab === "realtime" && <RealTimeTab />}
