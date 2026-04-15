@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "carpetpro",
+      "runtimeExecutable": "/bin/sh",
+      "runtimeArgs": ["-c", "PATH=/Users/amandagoedert/Downloads/veloxbr-main/node_modules/.bin:/Users/amandagoedert/.nvm/versions/node/v18.20.8/bin:$PATH npm run dev"],
+      "port": 8080,
+      "autoPort": true
+    }
+  ]
+}
