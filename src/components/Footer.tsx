@@ -35,11 +35,11 @@ const Footer = () => {
           <div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mb-3">Atendimento</p>
             <div className="space-y-2">
-              <a href="https://wa.me/5511974004406" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-white text-xs transition-colors justify-center sm:justify-start">
-                <Phone className="w-3.5 h-3.5 text-primary" /> (11) 97400-4406
+              <a href="https://wa.me/5548991969982" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/50 hover:text-white text-xs transition-colors justify-center sm:justify-start">
+                <Phone className="w-3.5 h-3.5 text-primary" /> (48) 99196-9982
               </a>
               <a
-                href="https://wa.me/5511974004406"
+                href="https://wa.me/5548991969982"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#25D366] text-white font-bold px-5 py-2.5 rounded-xl text-xs hover:brightness-110 transition-all mt-2"
@@ -66,7 +66,7 @@ const Footer = () => {
               
               <p className="flex items-start gap-2 text-white/50 text-xs justify-center sm:justify-start">
                 <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                Av. Jorge João Saad, SN Vl. Progredior – CEP: 05618-000 – São Paulo/SP
+                Av. Pres. Juscelino Kubitshek de Oliveira, SN – Centro – Içara/SC – CEP: 88820-000
               </p>
             </div>
           </div>

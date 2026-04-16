@@ -6,7 +6,7 @@ const menuItems = [
   { label: "Produtos", href: "/" },
   { label: "Como Funciona", href: "/#descricao" },
   { label: "Avaliações", href: "/#avaliacoes" },
-  { label: "Fale Conosco", href: "https://wa.me/5511974004406", external: true },
+  { label: "Fale Conosco", href: "https://wa.me/5548991969982", external: true },
 ];
 
 const Header = () => {
@@ -29,7 +29,7 @@ const Header = () => {
           </a>
 
           <a
-            href="https://wa.me/5511974004406"
+            href="https://wa.me/5548991969982"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Fale conosco"
