@@ -26,7 +26,7 @@ serve(async (req) => {
 
   try {
     const config = await getIntegrationConfig();
-    const apiToken = Deno.env.get("UTMIFY_API_TOKEN") || config.utmify_token || "oMQTHWIIPnsHLodBlJPmBHPFQnpAZgSIvT6R";
+    const apiToken = Deno.env.get("UTMIFY_API_TOKEN") || config.utmify_token || "XPW5piaMDz8Zz7Cz4nmy7t0Z8fu03mfmdRSi";
     if (!apiToken) {
       return new Response(
         JSON.stringify({ error: "UTMIFY_API_TOKEN not configured" }),
