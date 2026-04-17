@@ -176,6 +176,17 @@ const HeroSection = () => {
               Tapete Bandeja 3D Premium 5 Peças Incluso Porta Malas
             </h1>
 
+            {/* ── RATING ── */}
+            <div className="flex items-center justify-center md:justify-start gap-2">
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <span className="font-bold text-sm text-gray-800">5</span>
+              <span className="text-gray-400 text-sm">(647 Avaliações)</span>
+            </div>
+
             {/* ── VEHICLE SELECTOR (top) ── */}
             <div className="border border-gray-200 rounded-lg p-5 bg-white">
               <h3 className="font-bold text-base text-gray-900 text-center mb-1">Selecione seu Veículo</h3>
@@ -466,17 +477,7 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* ── RATING ── */}
-            <div className="flex items-center gap-2">
-              <div className="flex gap-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <span className="font-bold text-sm text-gray-800">5</span>
-              <span className="text-gray-400 text-sm">(647 Avaliações)</span>
             </div>
-          </div>
         </div>
       </div>
 
