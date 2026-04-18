@@ -176,7 +176,18 @@ serve(async (req) => {
       .eq("id", cart.id);
 
     // Fire all downstream integrations in parallel
-    const utmifyToken = Deno.env.get("UTMIFY_API_TOKEN");
+    let utmifyToken = Deno.env.get("UTMIFY_API_TOKEN");
+    if (!utmifyToken) {
+      try {
+        const cfgRes = await fetch(`${supabaseUrl}/rest/v1/site_content?key=eq.integrations&select=value`, {
+          headers: { apikey: serviceRoleKey, Authorization: `Bearer ${serviceRoleKey}` },
+        });
+        if (cfgRes.ok) {
+          const cfgData = await cfgRes.json();
+          utmifyToken = (cfgData?.[0]?.value as Record<string, string>)?.utmify_token || null;
+        }
+      } catch { /* keep utmifyToken null */ }
+    }
 
     const utmifyPayload = {
       orderId: utmifyOrderId,
@@ -192,6 +203,7 @@ serve(async (req) => {
         phone: cart.phone || null,
         document: cart.cpf || null,
         country: "BR",
+        ip: cart.ip_address && cart.ip_address !== "unknown" ? cart.ip_address : null,
       },
       products: [
         {

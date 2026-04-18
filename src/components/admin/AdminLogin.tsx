@@ -111,53 +111,17 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={handleLogin}
-                disabled={loading}
-                className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> ...</>
-                ) : (
-                  "Entrar"
-                )}
-              </button>
-
-              <button
-                onClick={async () => {
-                  if (!email.trim() || !password.trim()) {
-                    setError("Preencha o e-mail e a senha para criar a conta.");
-                    return;
-                  }
-                  setLoading(true);
-                  setError("");
-                  try {
-                    const { error: signUpError, data } = await supabase.auth.signUp({
-                      email: email.trim(),
-                      password
-                    });
-                    if (signUpError) {
-                      setError("Erro ao criar usuário: " + signUpError.message);
-                      return;
-                    }
-                    if (data.session) {
-                      onLogin(); // log in immediately if email confirmation is disabled
-                    } else {
-                      setError("Usuário criado com sucesso! Faça login ou verifique seu e-mail.");
-                    }
-                  } catch {
-                    setError("Erro ao criar usuário.");
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                disabled={loading}
-                className="flex-1 h-11 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                Criar Acesso
-              </button>
-            </div>
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full h-11 mt-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-blue-500/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Entrando...</>
+              ) : (
+                "Entrar"
+              )}
+            </button>
           </div>
         </div>
 
