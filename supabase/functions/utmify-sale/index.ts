@@ -34,6 +34,12 @@ serve(async (req) => {
       );
     }
 
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("cf-connecting-ip") ||
+      req.headers.get("x-real-ip") ||
+      null;
+
     const body = await req.json();
     const {
       orderId,
@@ -95,6 +101,7 @@ serve(async (req) => {
         phone: customer.phone || null,
         document: customer.document || null,
         country: "BR",
+        ip: clientIp,
       },
       products: [
         {
@@ -163,7 +170,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("UTMify edge function error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error", message: error.message }),
+      JSON.stringify({ error: "Internal server error", message: (error as Error).message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
